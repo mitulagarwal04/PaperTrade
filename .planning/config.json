@@ -12,6 +12,6 @@
     "auto_advance": true,
     "sub_repos": [],
     "research_before_questions": false,
-    "_auto_chain_active": true
+    "_auto_chain_active": false
   }
 }

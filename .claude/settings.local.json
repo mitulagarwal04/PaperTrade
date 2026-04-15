@@ -4,7 +4,15 @@
       "Skill(gsd-new-project)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(graphify:*)",
+      "Bash(cat)",
+      "Bash(bash /tmp/graphify_setup.sh)",
+      "Skill(gsd-plan-phase)",
+      "Skill(gsd-execute-phase)",
+      "Skill(gsd-verify-work)",
+      "Bash(ls -la .planning/phases/01-data-infrastructure/*UAT* .planning/phases/01-data-infrastructure/*VERIFICATION*)",
+      "Bash(ls backend/app/*.py)"
     ]
   }
 }

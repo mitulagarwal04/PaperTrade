@@ -12,7 +12,14 @@
       "Skill(gsd-execute-phase)",
       "Skill(gsd-verify-work)",
       "Bash(ls -la .planning/phases/01-data-infrastructure/*UAT* .planning/phases/01-data-infrastructure/*VERIFICATION*)",
-      "Bash(ls backend/app/*.py)"
+      "Bash(ls backend/app/*.py)",
+      "Bash(pip install:*)",
+      "Bash(export DATABASE_URL=\"sqlite+aiosqlite:///./test.db\")",
+      "Bash(python -c \"from app.main import app; print\\('App imports successfully'\\)\")",
+      "Skill(gsd-discuss-phase)",
+      "Skill(gsd-update)",
+      "Skill(gsd-progress)",
+      "mcp__plugin_claude-mem_mcp-search__smart_outline"
     ]
   }
 }

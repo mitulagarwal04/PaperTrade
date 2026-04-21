@@ -1,0 +1,393 @@
+{
+  "communities": {
+    "0": [
+      "base_baseprovider",
+      "base_baseprovider_denormalize_symbol",
+      "base_baseprovider_fetch_historical",
+      "base_baseprovider_normalize_symbol",
+      "base_providererror",
+      "base_ratelimiterror",
+      "base_rationale_14",
+      "base_rationale_19",
+      "base_rationale_26",
+      "base_rationale_31",
+      "base_rationale_37",
+      "base_rationale_46",
+      "base_rationale_50",
+      "base_rationale_54",
+      "base_rationale_9",
+      "basemodel",
+      "baseprovider",
+      "coingecko_provider_coingeckoprovider",
+      "coingecko_provider_coingeckoprovider_fetch_price",
+      "coingecko_provider_coingeckoprovider_health_check",
+      "coingecko_provider_coingeckoprovider_init",
+      "coingecko_provider_coingeckoprovider_normalize_symbol",
+      "coingecko_provider_rationale_10",
+      "coingecko_provider_rationale_42",
+      "coingecko_provider_rationale_82",
+      "coingecko_provider_rationale_91",
+      "exception",
+      "registry_rationale_20",
+      "registry_rationale_49",
+      "registry_rationale_54",
+      "registry_rationale_8",
+      "schemas_assetprice",
+      "schemas_rationale_9",
+      "yfinance_provider_rationale_10",
+      "yfinance_provider_rationale_24",
+      "yfinance_provider_rationale_33",
+      "yfinance_provider_rationale_56",
+      "yfinance_provider_rationale_64",
+      "yfinance_provider_yfinanceprovider",
+      "yfinance_provider_yfinanceprovider_fetch_price",
+      "yfinance_provider_yfinanceprovider_fetch_sync",
+      "yfinance_provider_yfinanceprovider_health_check",
+      "yfinance_provider_yfinanceprovider_normalize_symbol"
+    ],
+    "1": [
+      "CLAUDE_ai/ml_&_signals",
+      "CLAUDE_alternatives_considered",
+      "CLAUDE_api_keys_(all_have_free_tiers)",
+      "CLAUDE_backend",
+      "CLAUDE_backend_core",
+      "CLAUDE_constraints",
+      "CLAUDE_conventions",
+      "CLAUDE_data_sources_(free_apis)",
+      "CLAUDE_database",
+      "CLAUDE_document",
+      "CLAUDE_environment_variables_(backend",
+      "CLAUDE_frontend",
+      "CLAUDE_frontend_core",
+      "CLAUDE_install_postgresql_locally_or_",
+      "CLAUDE_installation",
+      "CLAUDE_project",
+      "CLAUDE_real-time_&_data",
+      "CLAUDE_recommended_stack",
+      "CLAUDE_required",
+      "CLAUDE_sources",
+      "CLAUDE_technology_stack",
+      "CLAUDE_tuning"
+    ],
+    "2": [
+      "conftest",
+      "conftest_async_db_session",
+      "conftest_event_loop",
+      "conftest_mock_cache_manager",
+      "conftest_rationale_13",
+      "conftest_rationale_21",
+      "database",
+      "database_base",
+      "database_get_session",
+      "database_init_db",
+      "database_make_session_factory",
+      "database_rationale_16",
+      "database_rationale_35",
+      "database_rationale_44",
+      "declarativebase",
+      "models_pricecache_is_fresh",
+      "models_pricecache_to_price",
+      "models_rationale_32",
+      "models_rationale_37"
+    ],
+    "3": [
+      "init",
+      "init_rationale_1",
+      "main",
+      "main_broadcast_prices",
+      "main_create_app",
+      "main_lifespan",
+      "main_rationale_18",
+      "main_rationale_65",
+      "manager",
+      "manager_connectionmanager",
+      "manager_connectionmanager_broadcast",
+      "manager_connectionmanager_connect",
+      "manager_connectionmanager_disconnect",
+      "manager_connectionmanager_init",
+      "manager_connectionmanager_send_to",
+      "manager_rationale_17",
+      "manager_rationale_27",
+      "manager_rationale_48",
+      "manager_rationale_7"
+    ],
+    "4": [
+      "README_api_endpoints",
+      "README_api_will_be_available_at_http:",
+      "README_architecture",
+      "README_clone_the_repo",
+      "README_configure_environment",
+      "README_docs_at_http://localhost:8000/",
+      "README_document",
+      "README_edit_.env_with_your_database_u",
+      "README_features",
+      "README_install_dependencies",
+      "README_key_design_patterns",
+      "README_license",
+      "README_papertrade",
+      "README_prerequisites",
+      "README_project_status",
+      "README_quick_start",
+      "README_run_the_app",
+      "README_setup",
+      "README_tech_stack"
+    ],
+    "5": [
+      "prices",
+      "prices_get_price",
+      "prices_health_check",
+      "prices_list_assets",
+      "prices_priceservice",
+      "prices_priceservice_get_price",
+      "prices_priceservice_init",
+      "prices_rationale_16",
+      "prices_rationale_24",
+      "prices_rationale_43",
+      "prices_rationale_58",
+      "prices_rationale_64",
+      "registry",
+      "registry_create_default",
+      "registry_providerregistry",
+      "registry_providerregistry_fetch_price",
+      "registry_providerregistry_health_check_all",
+      "registry_providerregistry_init"
+    ],
+    "6": [
+      "manager_cachemanager",
+      "manager_cachemanager_get",
+      "manager_cachemanager_get_cached_entry",
+      "manager_cachemanager_get_or_fetch",
+      "manager_cachemanager_init",
+      "manager_cachemanager_invalidate",
+      "manager_cachemanager_set",
+      "manager_rationale_12",
+      "manager_rationale_22",
+      "manager_rationale_41",
+      "manager_rationale_60",
+      "manager_rationale_79",
+      "models",
+      "models_pricecache"
+    ],
+    "7": [
+      "2026_04_15_phase_1_data_infrastructure_core",
+      "2026_04_15_phase_1_data_infrastructure_data_fetching",
+      "2026_04_15_phase_1_data_infrastructure_database",
+      "2026_04_15_phase_1_data_infrastructure_document",
+      "2026_04_15_phase_1_data_infrastructure_file_structure",
+      "2026_04_15_phase_1_data_infrastructure_phase_1:_data_infrastructure_i",
+      "2026_04_15_phase_1_data_infrastructure_task_1:_project_setup_and_depe",
+      "2026_04_15_phase_1_data_infrastructure_testing",
+      "2026_04_15_phase_1_data_infrastructure_utils"
+    ],
+    "8": [
+      "abc",
+      "base",
+      "base_fetch_price",
+      "base_health_check",
+      "base_rate_limit_delay"
+    ],
+    "9": [
+      "basesettings",
+      "config",
+      "config_get_settings",
+      "config_settings"
+    ],
+    "10": [
+      "deps",
+      "deps_get_db",
+      "deps_rationale_10"
+    ],
+    "11": [
+      "schemas",
+      "schemas_validate_currency",
+      "schemas_validate_symbol"
+    ],
+    "12": [
+      "yfinance_provider",
+      "yfinance_provider_rate_limit_delay"
+    ],
+    "13": [
+      "schemas_assetprice_with_stale_flag",
+      "schemas_rationale_36"
+    ],
+    "14": [
+      "coingecko_provider",
+      "coingecko_provider_rate_limit_delay"
+    ],
+    "15": [
+      "schemas_rationale_21"
+    ],
+    "16": [
+      "schemas_rationale_29"
+    ],
+    "17": [
+      "requirements_document"
+    ]
+  },
+  "cohesion": {
+    "0": 0.12,
+    "1": 0.09,
+    "2": 0.12,
+    "3": 0.13,
+    "4": 0.11,
+    "5": 0.15,
+    "6": 0.23,
+    "7": 0.22,
+    "8": 0.4,
+    "9": 0.67,
+    "10": 0.67,
+    "11": 0.67,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0
+  },
+  "gods": [
+    {
+      "id": "schemas_assetprice",
+      "label": "AssetPrice",
+      "edges": 47
+    },
+    {
+      "id": "base_baseprovider",
+      "label": "BaseProvider",
+      "edges": 23
+    },
+    {
+      "id": "base_providererror",
+      "label": "ProviderError",
+      "edges": 21
+    },
+    {
+      "id": "manager_cachemanager",
+      "label": "CacheManager",
+      "edges": 18
+    },
+    {
+      "id": "registry_providerregistry",
+      "label": "ProviderRegistry",
+      "edges": 18
+    },
+    {
+      "id": "coingecko_provider_coingeckoprovider",
+      "label": "CoinGeckoProvider",
+      "edges": 16
+    },
+    {
+      "id": "yfinance_provider_yfinanceprovider",
+      "label": "YFinanceProvider",
+      "edges": 15
+    },
+    {
+      "id": "models_pricecache",
+      "label": "PriceCache",
+      "edges": 12
+    },
+    {
+      "id": "manager_connectionmanager",
+      "label": "ConnectionManager",
+      "edges": 10
+    },
+    {
+      "id": "base_ratelimiterror",
+      "label": "RateLimitError",
+      "edges": 9
+    }
+  ],
+  "surprises": [
+    {
+      "source": "Create event loop for async tests.",
+      "target": "Base",
+      "source_files": [
+        "backend/tests/conftest.py",
+        "backend/app/database.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `Create event loop for async tests.` unexpectedly reaches hub `Base`"
+    },
+    {
+      "source": "Create a fresh database session for each test.",
+      "target": "Base",
+      "source_files": [
+        "backend/tests/conftest.py",
+        "backend/app/database.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `Create a fresh database session for each test.` unexpectedly reaches hub `Base`"
+    },
+    {
+      "source": "PriceCache",
+      "target": "Base",
+      "source_files": [
+        "backend/app/cache/models.py",
+        "backend/app/database.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "Background task to fetch and broadcast prices.",
+      "target": "CacheManager",
+      "source_files": [
+        "backend/app/main.py",
+        "backend/app/cache/manager.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    },
+    {
+      "source": "Background task to fetch and broadcast prices.",
+      "target": "ProviderRegistry",
+      "source_files": [
+        "backend/app/main.py",
+        "backend/app/providers/registry.py"
+      ],
+      "confidence": "INFERRED",
+      "relation": "uses",
+      "why": "inferred connection - not explicitly stated in source; bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `AssetPrice` connect `Community 0` to `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 11`, `Community 13`?",
+      "why": "High betweenness centrality (0.250) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Base` connect `Community 2` to `Community 6`?",
+      "why": "High betweenness centrality (0.095) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `PriceCache` connect `Community 6` to `Community 8`, `Community 0`, `Community 2`, `Community 3`?",
+      "why": "High betweenness centrality (0.082) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 43 inferred relationships involving `AssetPrice` (e.g. with `PriceCache` and `Check if cache entry is within TTL.`) actually correct?",
+      "why": "`AssetPrice` has 43 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 17 inferred relationships involving `BaseProvider` (e.g. with `YFinanceProvider` and `Yahoo Finance data provider via yfinance library.      Supports stocks, ETFs, in`) actually correct?",
+      "why": "`BaseProvider` has 17 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 17 inferred relationships involving `ProviderError` (e.g. with `YFinanceProvider` and `Yahoo Finance data provider via yfinance library.      Supports stocks, ETFs, in`) actually correct?",
+      "why": "`ProviderError` has 17 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 10 inferred relationships involving `CacheManager` (e.g. with `Background task to fetch and broadcast prices.` and `Application lifespan context manager.`) actually correct?",
+      "why": "`CacheManager` has 10 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}

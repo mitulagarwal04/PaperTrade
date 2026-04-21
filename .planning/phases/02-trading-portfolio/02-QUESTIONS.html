@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2: Trading & Portfolio — Discussion Questions</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .stats-bar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .progress-container {
+            flex: 1;
+            min-width: 200px;
+        }
+        .progress-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #22c55e;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+        .save-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-btn:hover {
+            background: #2563eb;
+        }
+        .section {
+            margin-bottom: 16px;
+        }
+        .section-header {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .section-header:hover {
+            border-color: #cbd5e1;
+        }
+        .section-header.active {
+            border-radius: 8px 8px 0 0;
+            border-bottom-color: transparent;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .section-arrow {
+            transition: transform 0.2s;
+            color: #64748b;
+        }
+        .section-header.active .section-arrow {
+            transform: rotate(180deg);
+        }
+        .section-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 20px;
+            display: none;
+        }
+        .section-content.open {
+            display: block;
+        }
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+        }
+        .question-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+        .question-card.answered {
+            border: 2px solid #22c55e;
+            background: #f0fdf4;
+        }
+        .question-card.chat-more {
+            border: 2px solid #f97316;
+        }
+        .question-id {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #3b82f6;
+            background: #dbeafe;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .question-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .question-context {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-style: italic;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .option:hover {
+            background: #f1f5f9;
+        }
+        .option input[type="radio"] {
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        .option-label {
+            flex: 1;
+        }
+        .option-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+        }
+        .option-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .chat-more-container {
+            margin-top: 12px;
+        }
+        .chat-more-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .chat-more-textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
+        .chat-more-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .chat-more-textarea.has-content {
+            border: 2px solid #f97316;
+        }
+        .instructions {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+        .instructions-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+        .instructions-text {
+            font-size: 0.875rem;
+            color: #78350f;
+        }
+        .instructions-text ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .instructions-text li {
+            margin-bottom: 4px;
+        }
+        @media (max-width: 768px) {
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phase 2: Trading & Portfolio — Discussion Questions</h1>
+        <p class="subtitle">Answer implementation decisions for order placement, portfolio tracking, and performance metrics.</p>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="total-count">12</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="answered-count">0</div>
+                <div class="stat-label">Answered</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="remaining-count">12</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bg">
+                    <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0% complete</div>
+            </div>
+            <button class="save-btn" onclick="saveAnswers()">Save answers</button>
+        </div>
+
+        <div id="sections-container"></div>
+
+        <div class="instructions">
+            <div class="instructions-title">How to use</div>
+            <div class="instructions-text">
+                <ul>
+                    <li>Click a section to expand and see questions</li>
+                    <li>Select the radio button for each question to answer</li>
+                    <li>Use "Add context" textarea for any notes or clarifications</li>
+                    <li>Green border = answered, Orange border = has notes pending</li>
+                    <li>Click <strong>Save answers</strong> when done</li>
+                    <li>Then tell Claude: <strong>"refresh"</strong> or <strong>"finalize"</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Question data
+        const questionsData = {
+            "phase": "02-trading-portfolio",
+            "generated_at": "2026-04-20T20:35:00+05:30",
+            "stats": {"total": 12, "answered": 0, "chat_more": 0, "remaining": 12},
+            "sections": [
+                {
+                    "id": "order-types",
+                    "title": "Order Types",
+                    "answeredCount": 0,
+                    "totalCount": 1,
+                    "questions": [
+                        {
+                            "id": "Q-01",
+                            "title": "Supported Order Types",
+                            "context": "Phase 2 requires order placement (TRADE-01). Must balance realism vs complexity. Backend currently has price feed infrastructure via ProviderRegistry.",
+                            "options": [
+                                {"id": "a", "label": "Market orders only", "description": "Simplest to implement. Buy/sell at current price. Good for MVP but limits trading strategies."},
+                                {"id": "b", "label": "Market + Limit orders", "description": "Covers 90% of retail trading. Moderate complexity. Recommended balance."},
+                                {"id": "c", "label": "Market + Limit + Stop Loss + Take Profit", "description": "Full TRADE-01 coverage. Higher complexity - requires trigger monitoring and conditional execution."},
+                                {"id": "d", "label": "Custom", "description": "Specify your own set"}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "order-execution",
+                    "title": "Order Execution",
+                    "answeredCount": 0,
+                    "totalCount": 2,
+                    "questions": [
+                        {
+                            "id": "Q-02",
+                            "title": "Order Fill Model",
+                            "context": "How orders execute affects realism vs performance. Current price feeds update every few seconds via WebSocket.",
+                            "options": [
+                                {"id": "a", "label": "Immediate fill at current price", "description": "Order fills instantly using latest price. Simple, no simulation queue. Best for paper trading MVP."},
+                                {"id": "b", "label": "Simulated delay with price slippage", "description": "Add realistic 50-500ms delay + random slippage (0.01-0.1%). Addresses TRADE-04 latency requirement."},
+                                {"id": "c", "label": "Full exchange simulation with order book", "description": "Simulated bid/ask spread, depth-based fills. Highest realism, significant complexity. Overkill for v1."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        },
+                        {
+                            "id": "Q-03",
+                            "title": "Partial Fills",
+                            "context": "TRADE-03 requires handling partial fills. Affects how open orders display and how P&L calculates.",
+                            "options": [
+                                {"id": "a", "label": "No partial fills - all or nothing", "description": "Simpler order state model. One fill record per order. Not realistic but easier to implement."},
+                                {"id": "b", "label": "Support partial fills", "description": "Order can be 30% filled, 70% open. Requires fill records per execution. More realistic, moderate complexity."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "portfolio-model",
+                    "title": "Portfolio Data Model",
+                    "answeredCount": 0,
+                    "totalCount": 2,
+                    "questions": [
+                        {
+                            "id": "Q-04",
+                            "title": "Position Tracking Method",
+                            "context": "PORT-01 requires portfolio tracking. How positions aggregate matters for P&L and portfolio view.",
+                            "options": [
+                                {"id": "a", "label": "Simple - current quantity per symbol", "description": "Track total shares/coins held. Display current value. Lose cost basis history for P&L."},
+                                {"id": "b", "label": "FIFO lots - track each purchase separately", "description": "Each buy creates a lot. Sell uses oldest first. Accurate realized P&L, standard tax method."},
+                                {"id": "c", "label": "Average cost basis", "description": "Track total quantity and average purchase price. Simplest P&L, common for portfolio tracking."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        },
+                        {
+                            "id": "Q-05",
+                            "title": "Multi-Currency Handling",
+                            "context": "Assets trade in USD, EUR, etc but user views in INR per CLAUDE.md constraints.",
+                            "options": [
+                                {"id": "a", "label": "Single base currency (INR only)", "description": "Convert everything to INR at transaction time. Simple portfolio view, all values in INR."},
+                                {"id": "b", "label": "Track original currency + live conversion", "description": "Store original USD/EUR amounts. Convert on-the-fly for display. More accurate but complex."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "cash-management",
+                    "title": "Cash Management",
+                    "answeredCount": 0,
+                    "totalCount": 2,
+                    "questions": [
+                        {
+                            "id": "Q-06",
+                            "title": "Cash Reservation for Open Orders",
+                            "context": "When order placed, is cash reserved? Or only deducted on fill? Affects available balance display.",
+                            "options": [
+                                {"id": "a", "label": "Reserve on order placement", "description": "Cash deducted when order placed, released if cancelled. Prevents overspending. More realistic."},
+                                {"id": "b", "label": "Deduct on fill only", "description": "Cash stays available until order executes. Risk of overspending if multiple orders placed. Simpler."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        },
+                        {
+                            "id": "Q-07",
+                            "title": "Starting Capital",
+                            "context": "CLAUDE.md specifies 100K INR starting capital. Any flexibility?",
+                            "options": [
+                                {"id": "a", "label": "Fixed 100K INR", "description": "Hardcoded per spec. Simple, no config needed."},
+                                {"id": "b", "label": "Configurable initial capital", "description": "Env var or setting. Allows testing with different amounts. Slight complexity."},
+                                {"id": "c", "label": "Multiple portfolio support", "description": "User can create multiple portfolios with different capitals. More complex, enables A/B testing."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "trade-history",
+                    "title": "Trade History",
+                    "answeredCount": 0,
+                    "totalCount": 1,
+                    "questions": [
+                        {
+                            "id": "Q-08",
+                            "title": "Trade Detail Level",
+                            "context": "PORT-02 requires trade history table. What details per trade?",
+                            "options": [
+                                {"id": "a", "label": "Basic: symbol, qty, price, timestamp", "description": "Clean simple view. Covers essentials only."},
+                                {"id": "b", "label": "Detailed: add P&L per trade, order type, execution time", "description": "Rich view with realized P&L, order type, latency. Better for analysis."},
+                                {"id": "c", "label": "Full audit: order ID, fills, status transitions", "description": "Complete lifecycle view. Overkill for most users but good for debugging."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "pnl-metrics",
+                    "title": "P&L & Performance",
+                    "answeredCount": 0,
+                    "totalCount": 2,
+                    "questions": [
+                        {
+                            "id": "Q-09",
+                            "title": "P&L Display",
+                            "context": "PORT-03 requires performance metrics. What to show?",
+                            "options": [
+                                {"id": "a", "label": "Total P&L only", "description": "Simple net gain/loss. Easy to understand, minimal calculation."},
+                                {"id": "b", "label": "Realized + Unrealized P&L", "description": "Separate closed trades vs open positions. Standard trading view, moderate complexity."},
+                                {"id": "c", "label": "Full metrics: P&L, win rate, avg gain/loss, max drawdown", "description": "Complete trading statistics. Best for serious trading review, most complex."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        },
+                        {
+                            "id": "Q-10",
+                            "title": "Daily/Session Reset",
+                            "context": "PORT-04 requires portfolio reset. Also useful for daily P&L tracking.",
+                            "options": [
+                                {"id": "a", "label": "Full reset to initial capital", "description": "Clears all positions, resets cash. Simple implementation."},
+                                {"id": "b", "label": "Archive current portfolio, start fresh", "description": "Keep history but start new tracking period. Enables performance over time analysis."},
+                                {"id": "c", "label": "Daily P&L snapshot only", "description": "No reset, just mark day-end values. Track daily performance without losing positions."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                },
+                {
+                    "id": "order-management",
+                    "title": "Order Management",
+                    "answeredCount": 0,
+                    "totalCount": 2,
+                    "questions": [
+                        {
+                            "id": "Q-11",
+                            "title": "Order Validity (Time in Force)",
+                            "context": "TRADE-02 requires viewing/canceling open orders. How long do limit orders stay open?",
+                            "options": [
+                                {"id": "a", "label": "GTC - Good Till Canceled", "description": "Orders stay open until filled or manually cancelled. Most common for limit orders."},
+                                {"id": "b", "label": "Day orders only", "description": "Orders auto-cancel at session end. Simpler state management, requires session concept."},
+                                {"id": "c", "label": "Both GTC and Day", "description": "User chooses. Flexible, moderate complexity."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        },
+                        {
+                            "id": "Q-12",
+                            "title": "Order Modification",
+                            "context": "Can users modify open orders? Change limit price or quantity?",
+                            "options": [
+                                {"id": "a", "label": "Cancel/replace only", "description": "Must cancel and create new order. Simpler, standard pattern."},
+                                {"id": "b", "label": "In-place modification", "description": "Edit price/qty directly. Better UX, more complex state tracking."}
+                            ],
+                            "answer": null,
+                            "chat_more": "",
+                            "status": "unanswered"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // State management
+        let state = JSON.parse(JSON.stringify(questionsData));
+
+        function updateStats() {
+            let answered = 0;
+            let chatMore = 0;
+
+            state.sections.forEach(section => {
+                section.questions.forEach(q => {
+                    if (q.answer) answered++;
+                    if (q.chat_more && q.chat_more.trim()) chatMore++;
+                });
+            });
+
+            const total = state.stats.total;
+            const remaining = total - answered;
+            const pct = Math.round((answered / total) * 100);
+
+            document.getElementById('answered-count').textContent = answered;
+            document.getElementById('remaining-count').textContent = remaining;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = pct + '% complete';
+
+            // Update section badges
+            state.sections.forEach(section => {
+                let secAnswered = 0;
+                section.questions.forEach(q => {
+                    if (q.answer) secAnswered++;
+                });
+                section.answeredCount = secAnswered;
+            });
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sections-container');
+            container.innerHTML = '';
+
+            state.sections.forEach((section, secIdx) => {
+                const secEl = document.createElement('div');
+                secEl.className = 'section';
+
+                const answeredStr = section.answeredCount > 0
+                    ? `${section.answeredCount}/${section.totalCount} answered`
+                    : `${section.totalCount} questions`;
+
+                secEl.innerHTML = `
+                    <div class="section-header" onclick="toggleSection(${secIdx})">
+                        <div class="section-title">
+                            ${section.title}
+                            <span class="section-badge">${answeredStr}</span>
+                        </div>
+                        <span class="section-arrow">▼</span>
+                    </div>
+                    <div class="section-content" id="section-${secIdx}">
+                        <div class="questions-grid" id="questions-${secIdx}"></div>
+                    </div>
+                `;
+
+                container.appendChild(secEl);
+
+                // Render questions
+                const qContainer = secEl.querySelector(`#questions-${secIdx}`);
+                section.questions.forEach((q, qIdx) => {
+                    const card = document.createElement('div');
+                    card.className = 'question-card' + (q.answer ? ' answered' : '') + (q.chat_more ? ' chat-more' : '');
+                    card.id = `card-${secIdx}-${qIdx}`;
+
+                    let optionsHtml = '';
+                    q.options.forEach(opt => {
+                        const checked = q.answer === opt.id ? 'checked' : '';
+                        optionsHtml += `
+                            <label class="option">
+                                <input type="radio" name="q-${secIdx}-${qIdx}" value="${opt.id}" ${checked}
+                                       onchange="setAnswer(${secIdx}, ${qIdx}, '${opt.id}')">
+                                <div class="option-label">
+                                    <div class="option-name">${opt.label}</div>
+                                    <div class="option-desc">${opt.description}</div>
+                                </div>
+                            </label>
+                        `;
+                    });
+
+                    const hasContent = q.chat_more ? 'has-content' : '';
+                    card.innerHTML = `
+                        <div class="question-id">${q.id}</div>
+                        <div class="question-title">${q.title}</div>
+                        <div class="question-context">${q.context}</div>
+                        <div class="options">${optionsHtml}</div>
+                        <div class="chat-more-container">
+                            <div class="chat-more-label">Add context (optional):</div>
+                            <textarea class="chat-more-textarea ${hasContent}" id="chat-${secIdx}-${qIdx}"
+                                      placeholder="Add context, nuance, or clarification for this question..."
+                                      oninput="setChatMore(${secIdx}, ${qIdx}, this.value)">${q.chat_more || ''}</textarea>
+                        </div>
+                    `;
+
+                    qContainer.appendChild(card);
+                });
+            });
+        }
+
+        function toggleSection(idx) {
+            const content = document.getElementById(`section-${idx}`);
+            const header = content.previousElementSibling;
+            content.classList.toggle('open');
+            header.classList.toggle('active');
+        }
+
+        function setAnswer(secIdx, qIdx, value) {
+            state.sections[secIdx].questions[qIdx].answer = value;
+            state.sections[secIdx].questions[qIdx].status = 'answered';
+
+            const card = document.getElementById(`card-${secIdx}-${qIdx}`);
+            card.classList.add('answered');
+            card.classList.remove('chat-more');
+
+            updateStats();
+        }
+
+        function setChatMore(secIdx, qIdx, value) {
+            state.sections[secIdx].questions[qIdx].chat_more = value;
+
+            const textarea = document.getElementById(`chat-${secIdx}-${qIdx}`);
+            if (value.trim()) {
+                textarea.classList.add('has-content');
+            } else {
+                textarea.classList.remove('has-content');
+            }
+
+            updateStats();
+        }
+
+        function saveAnswers() {
+            // Update stats in state
+            let answered = 0, chatMore = 0;
+            state.sections.forEach(section => {
+                section.questions.forEach(q => {
+                    if (q.answer) answered++;
+                    if (q.chat_more && q.chat_more.trim()) chatMore++;
+                });
+            });
+            state.stats.answered = answered;
+            state.stats.chat_more = chatMore;
+            state.stats.remaining = state.stats.total - answered;
+
+            // Convert to JSON
+            const jsonContent = JSON.stringify(state, null, 2);
+
+            // Try File System Access API first
+            if ('showSaveFilePicker' in window) {
+                showSaveFilePicker({
+                    suggestedName: '02-QUESTIONS.json',
+                    types: [{
+                        description: 'JSON Files',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                }).then(handle => {
+                    handle.createWritable().then(writable => {
+                        writable.write(jsonContent).then(() => {
+                            writable.close();
+                            alert('Answers saved! Now tell Claude: "refresh" or "finalize"');
+                        });
+                    });
+                }).catch(err => {
+                    downloadFallback(jsonContent);
+                });
+            } else {
+                downloadFallback(jsonContent);
+            }
+        }
+
+        function downloadFallback(content) {
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '02-QUESTIONS.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('Answers downloaded! Replace the original 02-QUESTIONS.json file, then tell Claude: "refresh" or "finalize"');
+        }
+
+        // Initialize
+        renderSections();
+        updateStats();
+
+        // Open first section by default
+        setTimeout(() => {
+            toggleSection(0);
+        }, 100);
+    </script>
+</body>
+</html>

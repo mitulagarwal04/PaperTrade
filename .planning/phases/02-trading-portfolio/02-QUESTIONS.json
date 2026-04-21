@@ -1,0 +1,339 @@
+{
+  "phase": "02-trading-portfolio",
+  "generated_at": "2026-04-20T20:35:00+05:30",
+  "stats": {
+    "total": 12,
+    "answered": 0,
+    "chat_more": 0,
+    "remaining": 12
+  },
+  "sections": [
+    {
+      "id": "order-types",
+      "title": "Order Types",
+      "questions": [
+        {
+          "id": "Q-01",
+          "title": "Supported Order Types",
+          "context": "Phase 2 requires order placement (TRADE-01). Must balance realism vs complexity. Backend currently has price feed infrastructure via ProviderRegistry.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Market orders only",
+              "description": "Simplest to implement. Buy/sell at current price. Good for MVP but limits trading strategies."
+            },
+            {
+              "id": "b",
+              "label": "Market + Limit orders",
+              "description": "Covers 90% of retail trading. Moderate complexity. Recommended balance."
+            },
+            {
+              "id": "c",
+              "label": "Market + Limit + Stop Loss + Take Profit",
+              "description": "Full TRADE-01 coverage. Higher complexity - requires trigger monitoring and conditional execution."
+            },
+            {
+              "id": "d",
+              "label": "Custom",
+              "description": "Specify your own set"
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "order-execution",
+      "title": "Order Execution",
+      "questions": [
+        {
+          "id": "Q-02",
+          "title": "Order Fill Model",
+          "context": "How orders execute affects realism vs performance. Current price feeds update every few seconds via WebSocket.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Immediate fill at current price",
+              "description": "Order fills instantly using latest price. Simple, no simulation queue. Best for paper trading MVP."
+            },
+            {
+              "id": "b",
+              "label": "Simulated delay with price slippage",
+              "description": "Add realistic 50-500ms delay + random slippage (0.01-0.1%). Addresses TRADE-04 latency requirement."
+            },
+            {
+              "id": "c",
+              "label": "Full exchange simulation with order book",
+              "description": "Simulated bid/ask spread, depth-based fills. Highest realism, significant complexity. Overkill for v1."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-03",
+          "title": "Partial Fills",
+          "context": "TRADE-03 requires handling partial fills. Affects how open orders display and how P&L calculates.",
+          "options": [
+            {
+              "id": "a",
+              "label": "No partial fills - all or nothing",
+              "description": "Simpler order state model. One fill record per order. Not realistic but easier to implement."
+            },
+            {
+              "id": "b",
+              "label": "Support partial fills",
+              "description": "Order can be 30% filled, 70% open. Requires fill records per execution. More realistic, moderate complexity."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "portfolio-model",
+      "title": "Portfolio Data Model",
+      "questions": [
+        {
+          "id": "Q-04",
+          "title": "Position Tracking Method",
+          "context": "PORT-01 requires portfolio tracking. How positions aggregate matters for P&L and portfolio view.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Simple - current quantity per symbol",
+              "description": "Track total shares/coins held. Display current value. Lose cost basis history for P&L."
+            },
+            {
+              "id": "b",
+              "label": "FIFO lots - track each purchase separately",
+              "description": "Each buy creates a lot. Sell uses oldest first. Accurate realized P&L, standard tax method."
+            },
+            {
+              "id": "c",
+              "label": "Average cost basis",
+              "description": "Track total quantity and average purchase price. Simplest P&L, common for portfolio tracking."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-05",
+          "title": "Multi-Currency Handling",
+          "context": "Assets trade in USD, EUR, etc but user views in INR per CLAUDE.md constraints.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Single base currency (INR only)",
+              "description": "Convert everything to INR at transaction time. Simple portfolio view, all values in INR."
+            },
+            {
+              "id": "b",
+              "label": "Track original currency + live conversion",
+              "description": "Store original USD/EUR amounts. Convert on-the-fly for display. More accurate but complex."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "cash-management",
+      "title": "Cash Management",
+      "questions": [
+        {
+          "id": "Q-06",
+          "title": "Cash Reservation for Open Orders",
+          "context": "When order placed, is cash reserved? Or only deducted on fill? Affects available balance display.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Reserve on order placement",
+              "description": "Cash deducted when order placed, released if cancelled. Prevents overspending. More realistic."
+            },
+            {
+              "id": "b",
+              "label": "Deduct on fill only",
+              "description": "Cash stays available until order executes. Risk of overspending if multiple orders placed. Simpler."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-07",
+          "title": "Starting Capital",
+          "context": "CLAUDE.md specifies 100K INR starting capital. Any flexibility?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Fixed 100K INR",
+              "description": "Hardcoded per spec. Simple, no config needed."
+            },
+            {
+              "id": "b",
+              "label": "Configurable initial capital",
+              "description": "Env var or setting. Allows testing with different amounts. Slight complexity."
+            },
+            {
+              "id": "c",
+              "label": "Multiple portfolio support",
+              "description": "User can create multiple portfolios with different capitals. More complex, enables A/B testing."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "trade-history",
+      "title": "Trade History",
+      "questions": [
+        {
+          "id": "Q-08",
+          "title": "Trade Detail Level",
+          "context": "PORT-02 requires trade history table. What details per trade?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Basic: symbol, qty, price, timestamp",
+              "description": "Clean simple view. Covers essentials only."
+            },
+            {
+              "id": "b",
+              "label": "Detailed: add P&L per trade, order type, execution time",
+              "description": "Rich view with realized P&L, order type, latency. Better for analysis."
+            },
+            {
+              "id": "c",
+              "label": "Full audit: order ID, fills, status transitions",
+              "description": "Complete lifecycle view. Overkill for most users but good for debugging."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "pnl-metrics",
+      "title": "P&L & Performance",
+      "questions": [
+        {
+          "id": "Q-09",
+          "title": "P&L Display",
+          "context": "PORT-03 requires performance metrics. What to show?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Total P&L only",
+              "description": "Simple net gain/loss. Easy to understand, minimal calculation."
+            },
+            {
+              "id": "b",
+              "label": "Realized + Unrealized P&L",
+              "description": "Separate closed trades vs open positions. Standard trading view, moderate complexity."
+            },
+            {
+              "id": "c",
+              "label": "Full metrics: P&L, win rate, avg gain/loss, max drawdown",
+              "description": "Complete trading statistics. Best for serious trading review, most complex."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-10",
+          "title": "Daily/Session Reset",
+          "context": "PORT-04 requires portfolio reset. Also useful for daily P&L tracking.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Full reset to initial capital",
+              "description": "Clears all positions, resets cash. Simple implementation."
+            },
+            {
+              "id": "b",
+              "label": "Archive current portfolio, start fresh",
+              "description": "Keep history but start new tracking period. Enables performance over time analysis."
+            },
+            {
+              "id": "c",
+              "label": "Daily P&L snapshot only",
+              "description": "No reset, just mark day-end values. Track daily performance without losing positions."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "order-management",
+      "title": "Order Management",
+      "questions": [
+        {
+          "id": "Q-11",
+          "title": "Order Validity (Time in Force)",
+          "context": "TRADE-02 requires viewing/canceling open orders. How long do limit orders stay open?",
+          "options": [
+            {
+              "id": "a",
+              "label": "GTC - Good Till Canceled",
+              "description": "Orders stay open until filled or manually cancelled. Most common for limit orders."
+            },
+            {
+              "id": "b",
+              "label": "Day orders only",
+              "description": "Orders auto-cancel at session end. Simpler state management, requires session concept."
+            },
+            {
+              "id": "c",
+              "label": "Both GTC and Day",
+              "description": "User chooses. Flexible, moderate complexity."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-12",
+          "title": "Order Modification",
+          "context": "Can users modify open orders? Change limit price or quantity?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Cancel/replace only",
+              "description": "Must cancel and create new order. Simpler, standard pattern."
+            },
+            {
+              "id": "b",
+              "label": "In-place modification",
+              "description": "Edit price/qty directly. Better UX, more complex state tracking."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    }
+  ]
+}

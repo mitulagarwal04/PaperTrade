@@ -1,11 +1,14 @@
+"""Test configuration and fixtures."""
 import asyncio
 import pytest
 from datetime import datetime
+from decimal import Decimal
 from unittest.mock import MagicMock, AsyncMock
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-
-from app.database import Base
+from sqlalchemy import select
+from app.database import Base, init_db
+from app.models.portfolio import UserCash
 
 
 @pytest.fixture(scope="session")
@@ -17,7 +20,7 @@ def event_loop():
 
 
 @pytest.fixture
-async def async_db_session():
+async def session():
     """Create a fresh database session for each test."""
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
     async_session = async_sessionmaker(
@@ -31,6 +34,19 @@ async def async_db_session():
         yield session
 
     await engine.dispose()
+
+
+@pytest.fixture
+async def user_cash(session):
+    """Create test user cash."""
+    cash = UserCash(
+        total_inr=Decimal("100000.00"),
+        reserved_inr=Decimal("0.00"),
+        available_inr=Decimal("100000.00"),
+    )
+    session.add(cash)
+    await session.commit()
+    return cash
 
 
 @pytest.fixture

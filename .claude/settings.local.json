@@ -19,7 +19,10 @@
       "Skill(gsd-discuss-phase)",
       "Skill(gsd-update)",
       "Skill(gsd-progress)",
-      "mcp__plugin_claude-mem_mcp-search__smart_outline"
+      "mcp__plugin_claude-mem_mcp-search__smart_outline",
+      "mcp__plugin_claude-mem_mcp-search____IMPORTANT",
+      "mcp__plugin_claude-mem_mcp-search__timeline",
+      "Bash(python:*)"
     ]
   }
 }

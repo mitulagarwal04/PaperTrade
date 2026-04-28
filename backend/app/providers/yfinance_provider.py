@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from app.providers.base import BaseProvider, ProviderError
@@ -48,7 +48,7 @@ class YFinanceProvider(BaseProvider):
             symbol=symbol.upper(),
             price=float(price),
             currency=info.get("currency", "USD").upper(),
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             source=self.name,
         )
 

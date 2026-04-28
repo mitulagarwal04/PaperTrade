@@ -25,12 +25,13 @@ class PriceCache(Base):
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
     )
 
     def is_fresh(self, ttl_seconds: int = 300) -> bool:
         """Check if cache entry is within TTL."""
-        age = datetime.utcnow() - self.timestamp
+        from datetime import timezone
+        age = datetime.now(timezone.utc) - self.timestamp
         return age < timedelta(seconds=ttl_seconds)
 
     def to_price(self) -> "AssetPrice":

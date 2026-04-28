@@ -22,7 +22,11 @@
       "mcp__plugin_claude-mem_mcp-search__smart_outline",
       "mcp__plugin_claude-mem_mcp-search____IMPORTANT",
       "mcp__plugin_claude-mem_mcp-search__timeline",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(curl -s http://localhost:8000/api/v1/prices/GOOGL)",
+      "Bash(curl -s http://localhost:8000/api/v1/prices/AAPL)",
+      "Bash(curl -s http://localhost:8000/api/v1/health)",
+      "Bash(pkill -9 -f uvicorn)"
     ]
   }
 }

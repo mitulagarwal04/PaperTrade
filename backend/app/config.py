@@ -11,7 +11,9 @@ class Settings(BaseSettings):
     )
 
     database_url: str
+    database_pass: Optional[str] = None
     debug: bool = False
+    log_level: str = "INFO"
     price_update_interval: int = 5
     cache_ttl_seconds: int = 300
     coingecko_api_key: Optional[str] = None

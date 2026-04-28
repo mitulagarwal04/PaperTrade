@@ -1,0 +1,613 @@
+================================================================================
+                    PaperTrade - Complete Manual Testing Guide
+================================================================================
+
+This guide walks you through EVERY feature built in Phase 1 and Phase 2,
+from environment setup to placing orders and verifying portfolio tracking.
+
+================================================================================
+SECTION 1: ENVIRONMENT SETUP
+================================================================================
+
+Step 1.1: Navigate to Project
+------------------------------
+    cd /home/pichuu/Desktop/PaperTrade
+
+Step 1.2: Create Python Environment (if needed)
+----------------------------------------------
+    # Check Python version (need 3.11+)
+    python3 --version -- should be 3.12 not <3.13
+
+    # Create virtual environment (optional but recommended)
+    python3.12 -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+Step 1.3: Install Dependencies
+-------------------------------
+    cd backend
+    pip install -r requirements.txt
+
+Step 1.4: Create Environment File
+----------------------------------
+    cat > .env << 'EOF'
+    DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/papertrade
+    CACHE_TTL_SECONDS=10
+    LOG_LEVEL=INFO
+    EOF
+
+Step 1.5: Verify Environment File
+----------------------------------
+    cat .env
+
+================================================================================
+SECTION 2: DATABASE SETUP
+================================================================================
+
+Step 2.1: Start PostgreSQL
+---------------------------
+    # Check PostgreSQL status
+    sudo systemctl status postgresql
+
+    # If not running, start it
+    sudo systemctl start postgresql
+    # OR on some systems:
+    sudo service postgresql start
+
+    Step 2.2: Create Database and User
+    -------------------------------------
+        sudo -u postgres psql << 'EOF'
+        CREATE DATABASE papertrade;
+        CREATE USER postgres WITH PASSWORD 'postgres';
+        GRANT ALL PRIVILEGES ON DATABASE papertrade TO postgres;
+        ALTER USER postgres WITH SUPERUSER;
+        \q
+        EOF
+
+    Step 2.3: Verify Database Connection
+---------------------------------------
+    sudo -u postgres psql papertrade -c "\dt"
+    # Should show "Did not find any relations" (tables created by app)
+
+================================================================================
+SECTION 3: START BACKEND SERVER
+================================================================================
+
+Step 3.1: Start the Server
+---------------------------
+    cd /home/pichuu/Desktop/PaperTrade/backend
+    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+    # Keep this terminal open - you'll see all logs here
+
+Step 3.2: Open FastAPI Auto-Docs (Browser Tab 1)
+-------------------------------------------------
+    Open URL: http://localhost:8000/docs
+
+    This is the interactive Swagger UI. You can:
+    - See all API endpoints
+    - Test endpoints directly
+    - View request/response schemas
+
+Step 3.3: Verify Health (Browser Tab 2 or Terminal)
+--------------------------------------------------
+    curl http://localhost:8000/api/v1/health
+
+    Expected Response:
+    {"status":"healthy","timestamp":"2026-04-27T...","version":"1.0.0"}
+
+================================================================================
+SECTION 4: PHASE 1 - DATA INFRASTRUCTURE TESTING
+================================================================================
+
+These features were built in Phase 1. Test each one:
+
+4.1: Price Provider - Get Asset Price
+--------------------------------------
+    In FastAPI Docs (/docs):
+    1. Scroll to "Prices" section
+    2. Click "GET /api/v1/prices/{symbol}"
+    3. Click "Try it out"
+    4. Enter symbol: "AAPL"
+    5. Click "Execute"
+
+    Expected Response:
+    {
+      "symbol": "AAPL",
+      "price": 198.75,
+      "currency": "USD",
+      "is_stale": false,
+      "source": "yfinance",
+      "timestamp": "2026-04-27T..."
+    }
+
+    Check Logs: Look for provider selection and cache hits/misses
+
+4.2: Price Provider - Crypto
+-----------------------------
+    Try symbol: "BTC-USD"
+
+    Check: Currency should be USD, source might be coingecko
+
+4.3: List Supported Assets
+--------------------------
+    In FastAPI Docs:
+    GET /api/v1/assets
+
+    Expected: List of supported symbols with asset types
+
+4.4: Provider Fallback Test
+----------------------------
+    Watch logs while requesting prices for different assets.
+    If Yahoo Finance fails, should fallback to CoinGecko automatically.
+
+4.5: Caching Test
+-----------------
+    Request same symbol twice quickly:
+    1. First request: Should hit Yahoo Finance (slow)
+    2. Second request (within 10s): Should return from cache (instant)
+
+    Check logs for "Cache miss" vs "Cache hit"
+
+4.6: Stale Data Test
+--------------------
+    Stop internet temporarily (or wait for cache expiry + provider failure)
+    Request should still return with is_stale=true
+
+================================================================================
+SECTION 5: PHASE 2 - ORDER MANAGEMENT TESTING
+================================================================================
+
+5.1: Check Initial State (Empty Portfolio)
+-------------------------------------------
+    GET /api/v1/portfolio
+
+    Expected:
+    {
+      "cash_inr": 100000.00,
+      "positions_value_inr": 0,
+      "total_value_inr": 100000.00,
+      "realized_pnl_inr": 0,
+      "unrealized_pnl_inr": 0,
+      ...
+    }
+
+5.2: Place First Market Buy Order
+----------------------------------
+    POST /api/v1/orders
+
+    Request Body:
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "MARKET",
+      "quantity": 5
+    }
+
+    Expected Response (201 Created):
+    {
+      "id": "...",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "MARKET",
+      "status": "FILLED",
+      "quantity": 5,
+      "filled_quantity": 5,
+      "filled_price": 198.75,
+      ...
+    }
+
+    Check Logs:
+    - Order received
+    - Price fetched from provider
+    - Slippage applied
+    - Execution latency recorded
+    - Cash deducted
+    - Portfolio lot created
+
+5.3: Verify Cash Reduced
+-------------------------
+    GET /api/v1/portfolio
+
+    Check: cash_inr should be ~100000 - (5 * price * 83 conversion)
+
+5.4: Verify Position Created
+-----------------------------
+    GET /api/v1/portfolio/positions
+
+    Expected:
+    {
+      "positions": [
+        {
+          "symbol": "AAPL",
+          "quantity": 5,
+          "avg_cost_price": 198.75,
+          "current_price": 198.75,
+          "market_value": ...,
+          "unrealized_pnl": ...
+        }
+      ]
+    }
+
+5.5: Check Trade History
+-------------------------
+    GET /api/v1/portfolio/trades
+
+    Expected: List showing the fill with slippage % and latency_ms
+
+5.6: Place Second Buy Order (Same Symbol)
+------------------------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "MARKET",
+      "quantity": 3
+    }
+
+    This creates a SECOND lot (FIFO tracking)
+
+5.7: Verify Multiple Lots
+--------------------------
+    Check database directly:
+    sudo -u postgres psql papertrade -c "SELECT symbol, quantity, remaining_quantity, is_open FROM portfolio_lots;"
+
+    Should show 2 rows for AAPL
+
+5.8: Place Market Sell Order (FIFO Test)
+-----------------------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "SELL",
+      "order_type": "MARKET",
+      "quantity": 4
+    }
+
+    This should consume from FIRST lot (FIFO)
+
+    Expected: First lot partially consumed, second lot untouched
+
+5.9: Verify FIFO Consumption
+-----------------------------
+    GET /api/v1/portfolio/positions
+
+    Check: Total AAPL quantity should be 4 (5 + 3 - 4)
+
+    Check realized P&L in portfolio summary
+
+    Check database:
+    sudo -u postgres psql papertrade -c "SELECT * FROM portfolio_lots;"
+    # First lot should show remaining_quantity < original
+
+5.10: Place Limit Order (Stays Open)
+-------------------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "LIMIT",
+      "quantity": 1,
+      "price": 100.00
+    }
+
+    Expected: Status = "OPEN" (price 100 is below market ~198)
+
+5.11: List Orders with Filter
+------------------------------
+    GET /api/v1/orders?status=OPEN
+    GET /api/v1/orders?status=FILLED
+    GET /api/v1/orders?status=CANCELLED
+    GET /api/v1/orders?status=ALL
+
+5.12: Cancel Open Order
+------------------------
+    POST /api/v1/orders/{id}/cancel
+
+    Use the ID from the limit order above.
+
+    Expected: Status changes to CANCELLED, cash released
+
+5.13: Place Limit Order That Executes Immediately
+--------------------------------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "LIMIT",
+      "quantity": 1,
+      "price": 250.00
+    }
+
+    Expected: Status = "FILLED" (price 250 > market ~198, executes immediately)
+
+================================================================================
+SECTION 6: ERROR HANDLING TESTS
+================================================================================
+
+6.1: Insufficient Cash
+-----------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "MARKET",
+      "quantity": 10000
+    }
+
+    Expected: 400 Bad Request with error about insufficient cash
+
+6.2: Sell Without Position
+---------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "TSLA",
+      "side": "SELL",
+      "order_type": "MARKET",
+      "quantity": 1
+    }
+
+    Expected: 400 error - no position to sell
+
+6.3: Sell More Than Owned
+--------------------------
+    Try to sell more AAPL than you have
+
+    Expected: Error about insufficient quantity
+
+6.4: Invalid Symbol
+--------------------
+    GET /api/v1/prices/INVALIDXYZ123
+
+    Expected: 404 Not Found or fallback handling
+
+6.5: Cancel Already Filled Order
+---------------------------------
+    Try to cancel a filled order
+
+    Expected: Error - can only cancel OPEN orders
+
+================================================================================
+SECTION 7: CRYPTO TESTING
+================================================================================
+
+7.1: Buy Crypto
+----------------
+    POST /api/v1/orders
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "order_type": "MARKET",
+      "quantity": 0.001
+    }
+
+    Check: Uses CoinGecko provider, BTC added to positions
+
+7.2: Crypto in Portfolio
+-------------------------
+    GET /api/v1/portfolio/positions
+
+    Should show both AAPL and BTC-USD
+
+================================================================================
+SECTION 8: PORTFOLIO RESET FEATURE
+================================================================================
+
+8.1: Reset Portfolio
+---------------------
+    POST /api/v1/portfolio/reset
+    {
+      "confirm": true
+    }
+
+    Expected:
+    - All positions liquidated (sold at current price)
+    - Cash reset to 100,000 INR
+    - Realized P&L recorded in archive
+    - All active lots closed
+
+8.2: Verify Reset
+------------------
+    GET /api/v1/portfolio
+
+    Check: cash_inr = 100000, positions empty
+
+    GET /api/v1/portfolio/positions
+
+    Check: empty array
+
+8.3: Check Archived Lots
+-------------------------
+    sudo -u postgres psql papertrade -c "SELECT * FROM archived_lots;"
+
+    Should show your previous AAPL/BTC lots with final P&L
+
+================================================================================
+SECTION 9: DATABASE VERIFICATION
+================================================================================
+
+Connect to database and inspect all tables:
+
+    sudo -u postgres psql papertrade
+
+9.1: List All Tables
+---------------------
+    \dt
+
+    Expected tables:
+    - orders
+    - trade_fills
+    - user_cash
+    - portfolio_lots
+    - archived_lots
+    - market_data_cache (Phase 1)
+
+9.2: Check Orders
+------------------
+    SELECT id, symbol, side, order_type, status, quantity, filled_quantity FROM orders;
+
+9.3: Check Trade Fills
+-----------------------
+    SELECT order_id, symbol, quantity, price, slippage_percent, execution_latency_ms FROM trade_fills;
+
+9.4: Check Portfolio Lots
+--------------------------
+    SELECT symbol, quantity, remaining_quantity, avg_price, is_open, realized_pnl FROM portfolio_lots;
+
+9.5: Check User Cash
+---------------------
+    SELECT user_id, cash_inr, currency FROM user_cash;
+
+9.6: Check Order History
+-------------------------
+    SELECT o.id, o.symbol, o.side, o.status, tf.price, tf.slippage_percent
+    FROM orders o
+    LEFT JOIN trade_fills tf ON o.id = tf.order_id;
+
+    \q to quit
+
+================================================================================
+SECTION 10: WEBSOCKET TESTING
+================================================================================
+
+10.1: Install WebSocket Client (if needed)
+-------------------------------------------
+    npm install -g wscat
+    # OR
+    pip install websockets
+
+10.2: Connect to WebSocket
+---------------------------
+    wscat -c "ws://localhost:8000/ws/prices"
+
+10.3: Send Subscriptions
+-------------------------
+    # Subscribe to AAPL
+    {"action": "subscribe", "symbol": "AAPL"}
+
+    # Subscribe to BTC
+    {"action": "subscribe", "symbol": "BTC-USD"}
+
+    # Unsubscribe
+    {"action": "unsubscribe", "symbol": "AAPL"}
+
+10.4: Watch Price Updates
+--------------------------
+    Prices should stream every 5 seconds with format:
+    {"symbol":"AAPL","price":198.75,"timestamp":"..."}
+
+================================================================================
+SECTION 11: RUN AUTOMATED TESTS
+================================================================================
+
+11.1: Run All Tests
+--------------------
+    cd /home/pichuu/Desktop/PaperTrade/backend
+    pytest tests/ -v
+
+11.2: Run Specific Test File
+-----------------------------
+    pytest tests/test_orders.py -v
+    pytest tests/test_portfolio.py -v
+
+11.3: Run with Coverage (optional)
+-----------------------------------
+    pip install pytest-cov
+    pytest tests/ --cov=app --cov-report=html
+
+================================================================================
+SECTION 12: BACKGROUND TASKS (Order Monitor)
+================================================================================
+
+The order_monitor.py runs every 5 seconds to check limit orders.
+
+12.1: Create Limit Order Below Market
+----------------------------------------
+    POST /api/v1/orders
+    {
+      "symbol": "AAPL",
+      "side": "BUY",
+      "order_type": "LIMIT",
+      "quantity": 1,
+      "price": 150.00
+    }
+
+    Note the order ID.
+
+12.2: Check Order Monitor Logs
+-------------------------------
+    In the server logs, watch for:
+    "Checking N open orders for price conditions"
+
+12.3: Order Stays Open
+----------------------
+    GET /api/v1/orders/{id}
+
+    Should stay OPEN until market price drops to 150
+
+================================================================================
+SECTION 13: MANUAL VERIFICATION CHECKLIST
+================================================================================
+
+[ ] Server starts without errors
+[ ] Health endpoint responds
+[ ] /docs loads with all endpoints visible
+[ ] Price fetch works for AAPL (stock)
+[ ] Price fetch works for BTC-USD (crypto)
+[ ] Provider fallback happens when Yahoo fails
+[ ] Cache returns data immediately on second request
+
+[ ] Initial cash = 100,000 INR
+[ ] Market BUY order fills immediately
+[ ] Cash decreases after buy
+[ ] Position appears in /positions
+[ ] Trade appears in /trades with slippage/latency
+[ ] Multiple buys create multiple lots
+
+[ ] Market SELL order fills immediately
+[ ] FIFO lot consumption works (oldest lot reduced first)
+[ ] Realized P&L calculated on sell
+[ ] Cash increases after sell
+[ ] Position quantity updates correctly
+
+[ ] Limit BUY below market stays OPEN
+[ ] Can cancel OPEN order
+[ ] Cash reserved for limit order and released on cancel
+[ ] Limit BUY above market fills immediately
+
+[ ] Insufficient cash rejected
+[ ] Sell without position rejected
+[ ] Sell more than owned rejected
+
+[ ] Crypto orders work (BTC-USD, ETH-USD)
+
+[ ] Portfolio reset works
+[ ] Reset liquidates all positions
+[ ] Reset archives lots to archived_lots table
+[ ] Cash back to 100,000 INR after reset
+
+[ ] Database has orders, fills, lots, cash records
+[ ] WebSocket streams prices
+
+[ ] All 11 pytest tests pass
+
+================================================================================
+SECTION 14: CLEANUP
+================================================================================
+
+14.1: Stop Server
+------------------
+    Ctrl+C in the terminal running uvicorn
+
+14.2: Reset Database (optional)
+------------------------------
+    sudo -u postgres psql -c "DROP DATABASE papertrade;"
+    sudo -u postgres psql -c "CREATE DATABASE papertrade;"
+
+14.3: Remove Virtual Environment (optional)
+--------------------------------------------
+    deactivate
+    rm -rf /home/pichuu/Desktop/PaperTrade/venv
+
+================================================================================
+                              END OF GUIDE
+================================================================================

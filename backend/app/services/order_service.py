@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.models.order import Order, OrderSide, OrderStatus, OrderType, TradeFill
 from app.models.portfolio import UserCash
 from app.services.execution_service import ExecutionService
+from app.services.portfolio_service import PortfolioService
 
 
 class OrderService:
@@ -21,15 +22,18 @@ class OrderService:
         self,
         db_session: AsyncSession,
         execution_service: Optional[ExecutionService] = None,
+        portfolio_service: Optional[PortfolioService] = None,
     ):
         """Initialize order service.
 
         Args:
             db_session: Database session
             execution_service: Execution service for fills. If None, creates default.
+            portfolio_service: Portfolio service for lot tracking. If None, creates default.
         """
         self.db = db_session
         self.execution_service = execution_service or ExecutionService()
+        self.portfolio_service = portfolio_service or PortfolioService(db_session)
 
     def _calculate_order_value_inr(
         self,
@@ -90,9 +94,8 @@ class OrderService:
                 f"have {cash.available_inr} INR"
             )
 
-        # Reserve cash
+        # Reserve cash (don't flush here - outer transaction handles commits)
         cash.reserve(order_value)
-        await self.db.flush()
 
         return order_value
 
@@ -192,6 +195,9 @@ class OrderService:
 
             await self.db.flush()
 
+            # Create portfolio lot
+            await self.portfolio_service.process_fill(fill, side)
+
         elif order_type == OrderType.LIMIT:
             # Check if limit condition met immediately
             fill = await self.execution_service.fill_limit_order(
@@ -211,9 +217,20 @@ class OrderService:
 
                 await self.db.flush()
 
+                # Create portfolio lot
+                await self.portfolio_service.process_fill(fill, side)
+
         # STOP orders remain OPEN until trigger condition is met
 
         await self.db.commit()
+
+        # Eagerly load fills for response
+        result = await self.db.execute(
+            select(Order)
+            .options(selectinload(Order.fills))
+            .where(Order.id == order.id)
+        )
+        order = result.scalar_one()
         return order
 
     async def cancel_order(
@@ -260,7 +277,14 @@ class OrderService:
         order.cancel_reason = reason
 
         await self.db.commit()
-        return order
+
+        # Eagerly load fills for response
+        result = await self.db.execute(
+            select(Order)
+            .options(selectinload(Order.fills))
+            .where(Order.id == order.id)
+        )
+        return result.scalar_one()
 
     async def get_order(
         self,
@@ -384,6 +408,9 @@ class OrderService:
                     )
                     cash.release_reservation(order.reserved_inr)
                     cash.deduct_cash(fill_value_inr)
+
+                # Create portfolio lot / consume FIFO lots
+                await self.portfolio_service.process_fill(fill, order.side)
 
         if fills:
             await self.db.commit()

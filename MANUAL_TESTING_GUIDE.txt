@@ -249,7 +249,7 @@ SECTION 5: PHASE 2 - ORDER MANAGEMENT TESTING
 5.7: Verify Multiple Lots
 --------------------------
     Check database directly:
-    sudo -u postgres psql papertrade -c "SELECT symbol, quantity, remaining_quantity, is_open FROM portfolio_lots;"
+    sudo -u postgres psql papertrade -c "SELECT symbol, quantity, remaining_quantity, is_closed FROM portfolio_lots;"
 
     Should show 2 rows for AAPL
 
@@ -415,11 +415,11 @@ SECTION 8: PORTFOLIO RESET FEATURE
 
     Check: empty array
 
-8.3: Check Archived Lots
--------------------------
-    sudo -u postgres psql papertrade -c "SELECT * FROM archived_lots;"
+8.3: Check Portfolio Snapshots (Archived State)
+-------------------------------------------------
+    sudo -u postgres psql papertrade -c "SELECT * FROM portfolio_snapshots;"
 
-    Should show your previous AAPL/BTC lots with final P&L
+    Should show your previous state snapshot with cash, positions, P&L at reset time.
 
 ================================================================================
 SECTION 9: DATABASE VERIFICATION
@@ -438,8 +438,8 @@ Connect to database and inspect all tables:
     - trade_fills
     - user_cash
     - portfolio_lots
-    - archived_lots
-    - market_data_cache (Phase 1)
+    - portfolio_snapshots
+    - price_cache
 
 9.2: Check Orders
 ------------------
@@ -447,11 +447,11 @@ Connect to database and inspect all tables:
 
 9.3: Check Trade Fills
 -----------------------
-    SELECT order_id, symbol, quantity, price, slippage_percent, execution_latency_ms FROM trade_fills;
+    SELECT order_id, symbol, quantity, price, slippage_pct, execution_latency_ms FROM trade_fills;
 
 9.4: Check Portfolio Lots
 --------------------------
-    SELECT symbol, quantity, remaining_quantity, avg_price, is_open, realized_pnl FROM portfolio_lots;
+    SELECT symbol, quantity, remaining_quantity, cost_basis, is_closed, realized_pnl FROM portfolio_lots;
 
 9.5: Check User Cash
 ---------------------
@@ -459,7 +459,7 @@ Connect to database and inspect all tables:
 
 9.6: Check Order History
 -------------------------
-    SELECT o.id, o.symbol, o.side, o.status, tf.price, tf.slippage_percent
+    SELECT o.id, o.symbol, o.side, o.status, tf.price, tf.slippage_pct
     FROM orders o
     LEFT JOIN trade_fills tf ON o.id = tf.order_id;
 
@@ -475,25 +475,52 @@ SECTION 10: WEBSOCKET TESTING
     # OR
     pip install websockets
 
-10.2: Connect to WebSocket
----------------------------
+10.2: Connect to WebSocket (using wscat)
+------------------------------------------
+    # Open a new terminal, run:
     wscat -c "ws://localhost:8000/ws/prices"
 
-10.3: Send Subscriptions
--------------------------
-    # Subscribe to AAPL
+    Expected: Connects and waits for messages (no initial output).
+
+10.3: Test WebSocket (Ping/Pong)
+----------------------------------
+    The WebSocket endpoint currently supports ping/pong health check.
+    After connecting with wscat (step 10.2), type:
+
     {"action": "subscribe", "symbol": "AAPL"}
 
-    # Subscribe to BTC
-    {"action": "subscribe", "symbol": "BTC-USD"}
+    Actually the current endpoint only responds to "ping":
 
-    # Unsubscribe
-    {"action": "unsubscribe", "symbol": "AAPL"}
+    Type in the wscat terminal:
+    ping
 
-10.4: Watch Price Updates
---------------------------
-    Prices should stream every 5 seconds with format:
-    {"symbol":"AAPL","price":198.75,"timestamp":"..."}
+    It should respond:
+    pong
+
+    Note: Price streaming subscriptions are not yet implemented.
+    The ws endpoint is wired but price broadcast logic is pending.
+
+10.4: Test via Python (Alternative)
+-------------------------------------
+    Open another terminal and run:
+
+    python3 << 'EOF'
+    import asyncio
+    import websockets
+
+    async def test_ws():
+        async with websockets.connect("ws://localhost:8000/ws/prices") as ws:
+            # Test ping/pong
+            await ws.send("ping")
+            response = await ws.recv()
+            print(f"Response: {response}")  # Expected: "pong"
+
+            # Wait and receive (connect, wait 5s, disconnect)
+            print("Connected. Waiting 5s...")
+            await asyncio.sleep(5)
+
+    asyncio.run(test_ws())
+    EOF
 
 ================================================================================
 SECTION 11: RUN AUTOMATED TESTS
@@ -582,7 +609,7 @@ SECTION 13: MANUAL VERIFICATION CHECKLIST
 
 [ ] Portfolio reset works
 [ ] Reset liquidates all positions
-[ ] Reset archives lots to archived_lots table
+[ ] Reset archives state to portfolio_snapshots table
 [ ] Cash back to 100,000 INR after reset
 
 [ ] Database has orders, fills, lots, cash records

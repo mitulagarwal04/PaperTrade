@@ -26,7 +26,14 @@
       "Bash(curl -s http://localhost:8000/api/v1/prices/GOOGL)",
       "Bash(curl -s http://localhost:8000/api/v1/prices/AAPL)",
       "Bash(curl -s http://localhost:8000/api/v1/health)",
-      "Bash(pkill -9 -f uvicorn)"
+      "Bash(pkill -9 -f uvicorn)",
+      "mcp__plugin_claude-mem_mcp-search__smart_unfold",
+      "Bash(curl:*)",
+      "Bash(tail -100 backend/logs/*.log)",
+      "mcp__plugin_claude-mem_mcp-search__get_observations",
+      "Bash(pkill -f uvicorn)",
+      "Bash(lsof -ti:8000)",
+      "Bash(xargs kill *)"
     ]
   }
 }

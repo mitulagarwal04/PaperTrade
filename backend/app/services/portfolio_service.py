@@ -205,7 +205,7 @@ class PortfolioService:
 
             # Update cash: add proceeds (handled in OrderService)
 
-        await self.db.commit()
+        await self.db.flush()
         return affected_lots
 
     async def get_positions(self) -> List[Position]:

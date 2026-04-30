@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2.5: Frontend — Discussion Questions</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; padding: 24px; }
+.container { max-width: 1280px; margin: 0 auto; }
+h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+.subtitle { color: #64748b; font-size: 0.875rem; margin-bottom: 20px; }
+.stats-bar { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.stats-bar .stat { font-size: 0.875rem; }
+.stat-number { font-weight: 700; font-size: 1.125rem; }
+.stat-total .stat-number { color: #3b82f6; }
+.stat-answered .stat-number { color: #22c55e; }
+.stat-remaining .stat-number { color: #f59e0b; }
+.progress-track { flex: 1; min-width: 120px; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s ease; width: 0%; }
+.save-btn { background: #3b82f6; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+.save-btn:hover { background: #2563eb; }
+.section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+.section-header { padding: 16px 24px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; }
+.section-header:hover { background: #f8fafc; }
+.section-title { font-size: 1rem; font-weight: 600; }
+.section-meta { font-size: 0.75rem; color: #64748b; }
+.arrow { transition: transform 0.2s ease; font-size: 0.75rem; color: #94a3b8; }
+.arrow.open { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section-body.open { display: block; }
+.questions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+@media (max-width: 1024px) { .questions-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .questions-grid { grid-template-columns: 1fr; } body { padding: 12px; } }
+.q-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; background: #fff; transition: border-color 0.2s, background 0.2s; }
+.q-card.answered { border: 2px solid #22c55e; background: #f0fdf4; }
+.q-id { display: inline-block; background: #e2e8f0; color: #475569; font-size: 0.6875rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
+.q-card.answered .q-id { background: #22c55e; color: #fff; }
+.q-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; line-height: 1.3; }
+.q-context { font-size: 0.75rem; color: #64748b; font-style: italic; margin-bottom: 12px; line-height: 1.4; }
+.q-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.q-options label { display: flex; align-items: flex-start; gap: 8px; font-size: 0.8125rem; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s; }
+.q-options label:hover { background: #f1f5f9; }
+.q-options input[type="radio"] { margin-top: 2px; flex-shrink: 0; }
+.opt-label { font-weight: 600; }
+.opt-desc { display: block; font-weight: 400; color: #475569; font-size: 0.75rem; margin-top: 1px; }
+.q-textarea textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; font-size: 0.75rem; font-family: inherit; resize: vertical; min-height: 48px; outline: none; transition: border-color 0.2s; }
+.q-textarea textarea:focus { border-color: #3b82f6; }
+.q-textarea textarea.chat-active { border: 2px solid #f97316; }
+.bottom-actions { margin-top: 24px; display: flex; gap: 12px; align-items: center; }
+.toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 0.875rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.instructions { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; font-size: 0.8125rem; color: #92400e; margin-bottom: 16px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Phase 2.5: Frontend — Discussion Questions</h1>
+<p class="subtitle">Answer at your own pace. Click Save when done, then tell Claude "refresh" to process.</p>
+
+<div class="instructions">
+<strong>Instructions:</strong> Select radio buttons for each question. Use "Custom" or textarea for nuance. Click <strong>"Save answers"</strong> when done — then tell Claude <strong>"refresh"</strong> to update or <strong>"finalize"</strong> to generate context.
+</div>
+
+<div class="stats-bar">
+  <div class="stat stat-total">Total: <span class="stat-number" id="stat-total">14</span></div>
+  <div class="stat stat-answered">Answered: <span class="stat-number" id="stat-answered">0</span></div>
+  <div class="stat stat-remaining">Remaining: <span class="stat-number" id="stat-remaining">14</span></div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <button class="save-btn" onclick="saveAnswers()">Save answers</button>
+</div>
+
+<div id="sections-container"></div>
+
+<div class="bottom-actions">
+  <button class="save-btn" onclick="saveAnswers()">Save answers</button>
+  <span style="font-size:0.8125rem;color:#64748b;">Then tell Claude: "refresh" or "finalize"</span>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const JSON_PATH = '02.5-QUESTIONS.json';
+
+const data = {
+  "phase": "02.5-frontend",
+  "generated_at": "2026-04-30T17:39:00Z",
+  "stats": { "total": 14, "answered": 0, "chat_more": 0, "remaining": 14 },
+  "sections": [
+    {
+      "id": "project-setup",
+      "title": "Project Setup & Tech Choices",
+      "questions": [
+        {
+          "id": "Q-01", "title": "State management approach",
+          "context": "Backend is REST + WebSocket streaming prices every 5s. Needs server state (orders, portfolio) + real-time state (prices). React Context built-in, Zustand lightweight, TanStack Query purpose-built for server state.",
+          "options": [
+            { "id": "a", "label": "React Context + useReducer", "description": "Zero deps, built-in React. Good for single-user app." },
+            { "id": "b", "label": "TanStack Query + minimal Zustand", "description": "Purpose-built server state. Auto-caching, loading/error states. Zustand for real-time price state." },
+            { "id": "c", "label": "Zustand standalone", "description": "Tiny (1KB), simple API. No caching helpers — manual refetch logic." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-02", "title": "Routing library",
+          "context": "4-6 top-level routes: portfolio, orders, assets, order detail. No nested layouts needed.",
+          "options": [
+            { "id": "a", "label": "React Router v6", "description": "Industry standard, well-documented, simple for this scale." },
+            { "id": "b", "label": "TanStack Router", "description": "Type-safe routes, built-in loaders. Heavier setup, overkill for 6 routes." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-03", "title": "API client approach",
+          "context": "~12 REST endpoints + 1 WebSocket. OpenAPI docs at /docs. Could generate typed client automatically.",
+          "options": [
+            { "id": "a", "label": "Manual typed fetch hooks", "description": "Simple, full control, minimal deps. Scales fine for 12 endpoints." },
+            { "id": "b", "label": "Axios + generated TS types", "description": "Axios for HTTP, generate types from OpenAPI spec. Less manual typing." },
+            { "id": "c", "label": "openapi-typescript codegen", "description": "Full client gen from OpenAPI. Zero manual API code. Adds build step." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "layout-nav", "title": "Layout & Navigation",
+      "questions": [
+        {
+          "id": "Q-04", "title": "Navigation structure",
+          "context": "Single-user app with 4-5 sections. Trading apps typically have dense persistent nav.",
+          "options": [
+            { "id": "a", "label": "Left sidebar (collapsible)", "description": "Standard for trading dashboards. Persistent visible nav. Collapsible for chart room later." },
+            { "id": "b", "label": "Top nav bar", "description": "Simpler, good for <5 items. Works well mobile. Less screen taken by nav." },
+            { "id": "c", "label": "Sidebar + top bar combo", "description": "Sidebar primary nav, top bar secondary actions. Most flexible, more UI surface." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-05", "title": "Mobile navigation pattern",
+          "context": "Per CLAUDE.md: support 375px breakpoint. Must work on mobile for monitoring.",
+          "options": [
+            { "id": "a", "label": "Bottom tab bar", "description": "Thumbs-friendly, persistent visible nav. 5 tabs max. Common in finance apps." },
+            { "id": "b", "label": "Hamburger drawer", "description": "Standard mobile pattern. Hides nav till tapped. More screen space." },
+            { "id": "c", "label": "Adaptive: sidebar → icons → bottom tabs", "description": "Sidebar on desktop, icon dock on tablet, bottom tabs on phone. Most work." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-06", "title": "Color theme",
+          "context": "Trading apps traditionally dark mode. Dark is default in Bloomberg, TradingView, Robinhood.",
+          "options": [
+            { "id": "a", "label": "Dark mode only", "description": "Serious trading aesthetic. Easier on eyes for long sessions. Matches industry standard." },
+            { "id": "b", "label": "Dark + light with toggle", "description": "User choice. More dev time for theme system + CSS variables. Good accessibility." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "portfolio-page", "title": "Portfolio Page",
+      "questions": [
+        {
+          "id": "Q-07", "title": "Portfolio page layout",
+          "context": "Backend returns cash, positions value, total value, P&L, win rate, drawdown, positions list. Charts are Phase 3.",
+          "options": [
+            { "id": "a", "label": "Summary cards row + positions table", "description": "Key metrics in cards at top, detailed positions below. Standard financial dashboard." },
+            { "id": "b", "label": "Full grid dashboard", "description": "Grid of stat cards in 2-3 cols + positions below. More visual dashboard feel." },
+            { "id": "c", "label": "Minimal: header + positions focus", "description": "Just total + P&L in header. Positions table main space. Chart placeholder for Phase 3." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-08", "title": "Portfolio empty state",
+          "context": "Initial state: 100K INR cash, zero positions, no trade history.",
+          "options": [
+            { "id": "a", "label": "Cash balance + 'No positions' + CTA", "description": "Show cash prominently, empty state with 'Place first trade' button to orders page." },
+            { "id": "b", "label": "Full layout with zeroes", "description": "Show full portfolio layout. Metric cards at 0. Cash card at 100K. Feels complete." },
+            { "id": "c", "label": "Onboarding with suggestion", "description": "Friendly message: 'Start with 100K INR — try buying AAPL or BTC.' Educational." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "orders-page", "title": "Orders Page",
+      "questions": [
+        {
+          "id": "Q-09", "title": "Order placement UX",
+          "context": "Form: symbol, side (BUY/SELL), type (MARKET/LIMIT/STOP_LOSS/TAKE_PROFIT), quantity, optional price.",
+          "options": [
+            { "id": "a", "label": "Side panel / drawer", "description": "Slides from right. Doesn't leave current page. Keep order list visible. Common in trading." },
+            { "id": "b", "label": "Modal / dialog", "description": "Centered overlay. Simple, focused, works mobile. Blocks background." },
+            { "id": "c", "label": "Dedicated order page", "description": "Full page form. Most room for price preview + validation. Requires nav away." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-10", "title": "Order list display",
+          "context": "Statuses: PENDING, OPEN, PARTIAL_FILLED, FILLED, CANCELLED, REJECTED. User needs to scan + take action (cancel).",
+          "options": [
+            { "id": "a", "label": "Table with status badges", "description": "Rows: symbol, side, qty, price, status, date, actions. Sortable. Most data-dense." },
+            { "id": "b", "label": "Card list grouped by status", "description": "Grouped: Open Orders, Filled, Cancelled. Cards more visual, less dense." },
+            { "id": "c", "label": "Tabs: Open vs History + tables", "description": "Two tabs. Open = cancellable orders. History = completed. Clean separation." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "real-time", "title": "Real-time & Data",
+      "questions": [
+        {
+          "id": "Q-11", "title": "WS reconnection strategy",
+          "context": "WebSocket at /ws/prices streams all prices every 5s. Connection drops happen. Single-user, no auth.",
+          "options": [
+            { "id": "a", "label": "Auto-reconnect exponential backoff", "description": "Reconnect: 1s, 2s, 4s, 8s, cap 30s. 'Reconnecting...' banner. Seamless." },
+            { "id": "b", "label": "Auto-reconnect + polling fallback", "description": "Auto-reconnect. If fails after N retries, fallback to GET /prices/{symbol} polling every 10s." },
+            { "id": "c", "label": "Manual reconnect + status dot", "description": "Green/red status indicator. User clicks to retry. Simpler but user must notice." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-12", "title": "Stale price indicator",
+          "context": "Backend sends is_stale: true when provider fails but cached data exists. User needs awareness.",
+          "options": [
+            { "id": "a", "label": "Yellow warning badge", "description": "Small icon + 'Stale' badge next to price. Stands out on dark theme." },
+            { "id": "b", "label": "Dim/desaturate stale prices", "description": "Reduced opacity or gray tint. Subtle but noticeable. Less intrusive." },
+            { "id": "c", "label": "Dimmed text + tooltip timing", "description": "Price dimmed. Hover tooltip: 'Last updated: Xs ago'. Most informative." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "polish", "title": "Responsive & Polish",
+      "questions": [
+        {
+          "id": "Q-13", "title": "Desktop data density",
+          "context": "Trading apps traditionally dense. General web apps spacious. Tradeoff: info density vs readability.",
+          "options": [
+            { "id": "a", "label": "Compact (trading-dense)", "description": "Small padding, more rows visible. Smaller table fonts. Bloomberg-like density." },
+            { "id": "b", "label": "Moderate (balanced)", "description": "Standard web spacing. Comfortable rows. Not as dense as terminals." },
+            { "id": "c", "label": "Spacious (modern SaaS)", "description": "Generous padding, larger fonts. Less data per screen but more readable." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        },
+        {
+          "id": "Q-14", "title": "Error & 404 pages",
+          "context": "4-5 routes. Single-user so 404s rare. API errors (500, timeout) more likely.",
+          "options": [
+            { "id": "a", "label": "Toast notifications for errors", "description": "API errors = toast top-right. 404 redirects to portfolio. Minimal, keeps flow." },
+            { "id": "b", "label": "Inline error banners per section", "description": "Failed section shows inline error banner + retry button. Branded 404 page." },
+            { "id": "c", "label": "Full error page with retry + status", "description": "Dedicated error display with details, retry, connection status. Most thorough." }
+          ],
+          "answer": null, "chat_more": "", "status": "unanswered"
+        }
+      ]
+    }
+  ]
+};
+
+let state = JSON.parse(JSON.stringify(data));
+
+function render() {
+  const container = document.getElementById('sections-container');
+  let html = '';
+  for (const section of state.sections) {
+    const answered = section.questions.filter(q => q.answer !== null).length;
+    html += `
+      <div class="section">
+        <div class="section-header" onclick="toggleSection('${section.id}')">
+          <div>
+            <div class="section-title">${section.title}</div>
+            <div class="section-meta">${answered}/${section.questions.length} answered</div>
+          </div>
+          <span class="arrow" id="arrow-${section.id}">▶</span>
+        </div>
+        <div class="section-body" id="body-${section.id}">
+          <div class="questions-grid">
+            ${section.questions.map(q => renderCard(section.id, q)).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+  updateStats();
+}
+
+function renderCard(sectionId, q) {
+  const answered = q.answer !== null;
+  const chatActive = q.chat_more && q.chat_more.trim().length > 0;
+  return `
+    <div class="q-card ${answered ? 'answered' : ''}" id="card-${q.id}">
+      <div class="q-id">${q.id}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="q-context">${q.context}</div>
+      <div class="q-options">
+        ${q.options.map(opt => `
+          <label>
+            <input type="radio" name="${q.id}" value="${opt.id}"
+              ${q.answer === opt.id ? 'checked' : ''}
+              onchange="setAnswer('${q.id}', '${opt.id}')">
+            <div>
+              <span class="opt-label">${opt.label}</span>
+              <span class="opt-desc">${opt.description}</span>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+      <div class="q-textarea">
+        <textarea placeholder="Add context, nuance, or clarification..."
+          oninput="setChatMore('${q.id}', this.value)"
+          class="${chatActive ? 'chat-active' : ''}"
+          id="ta-${q.id}">${q.chat_more || ''}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function findQuestion(id) {
+  for (const section of state.sections) {
+    for (const q of section.questions) {
+      if (q.id === id) return q;
+    }
+  }
+  return null;
+}
+
+function setAnswer(id, value) {
+  const q = findQuestion(id);
+  if (!q) return;
+  q.answer = value;
+  q.status = 'answered';
+  const card = document.getElementById(`card-${id}`);
+  if (card) {
+    card.classList.add('answered');
+    const badge = card.querySelector('.q-id');
+    if (badge) badge.style.background = '#22c55e';
+  }
+  updateStats();
+}
+
+function setChatMore(id, value) {
+  const q = findQuestion(id);
+  if (!q) return;
+  q.chat_more = value;
+  q.status = value.trim() ? 'chat-more' : 'answered';
+  const ta = document.getElementById(`ta-${id}`);
+  if (ta) {
+    ta.classList.toggle('chat-active', value.trim().length > 0);
+  }
+  updateStats();
+}
+
+function updateStats() {
+  let answered = 0;
+  let chatMore = 0;
+  for (const section of state.sections) {
+    for (const q of section.questions) {
+      if (q.answer !== null) answered++;
+      if (q.chat_more && q.chat_more.trim()) chatMore++;
+    }
+  }
+  const total = state.stats.total;
+  const remaining = total - answered;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-answered').textContent = answered;
+  document.getElementById('stat-remaining').textContent = remaining;
+  document.getElementById('progress-fill').style.width = total > 0 ? `${(answered / total) * 100}%` : '0%';
+  state.stats.answered = answered;
+  state.stats.chat_more = chatMore;
+  state.stats.remaining = remaining;
+
+  for (const section of state.sections) {
+    const sectionAnswered = section.questions.filter(q => q.answer !== null).length;
+    const meta = document.querySelector(`#body-${section.id}`)?.closest('.section')?.querySelector('.section-meta');
+    if (meta) meta.textContent = `${sectionAnswered}/${section.questions.length} answered`;
+  }
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(`body-${id}`);
+  const arrow = document.getElementById(`arrow-${id}`);
+  if (body && arrow) {
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+}
+
+function saveAnswers() {
+  const payload = JSON.stringify(state, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '02.5-QUESTIONS.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Answers saved as 02.5-QUESTIONS.json — replace the original file, then tell Claude "refresh"');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  render();
+  const firstSection = state.sections[0];
+  if (firstSection) {
+    document.getElementById(`body-${firstSection.id}`)?.classList.add('open');
+    document.getElementById(`arrow-${firstSection.id}`)?.classList.add('open');
+  }
+});
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>

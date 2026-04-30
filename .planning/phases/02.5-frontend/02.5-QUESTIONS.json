@@ -1,0 +1,388 @@
+{
+  "phase": "02.5-frontend",
+  "generated_at": "2026-04-30T17:39:00Z",
+  "stats": {
+    "total": 14,
+    "answered": 0,
+    "chat_more": 0,
+    "remaining": 14
+  },
+  "sections": [
+    {
+      "id": "project-setup",
+      "title": "Project Setup & Tech Choices",
+      "questions": [
+        {
+          "id": "Q-01",
+          "title": "State management approach",
+          "context": "Backend is REST + WebSocket streaming prices every 5s. Need server state (orders, portfolio) + real-time state (prices). React Context built-in, Zustand lightweight, TanStack Query purpose-built for server state + caching.",
+          "options": [
+            {
+              "id": "a",
+              "label": "React Context + useReducer",
+              "description": "Zero dependencies, built-in React. Good for single-user app. More boilerplate for complex state. Fine for this scale."
+            },
+            {
+              "id": "b",
+              "label": "TanStack Query (React Query)",
+              "description": "Purpose-built for server state. Auto-caching, refetch, loading/error states built-in. Pair with minimal Zustand for real-time price state."
+            },
+            {
+              "id": "c",
+              "label": "Zustand standalone",
+              "description": "Tiny (1KB), simple API, no boilerplate. Works well but need to manually handle caching/refetch patterns."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-02",
+          "title": "Routing library",
+          "context": "App needs 4-6 top-level routes: portfolio, orders, prices/assets, order detail. No nested layouts needed. React Router v6 is standard. TanStack Router has type-safe routes but heavier.",
+          "options": [
+            {
+              "id": "a",
+              "label": "React Router v6",
+              "description": "Industry standard, well-documented, simple enough for this app size. Loaders/actions via createBrowserRouter."
+            },
+            {
+              "id": "b",
+              "label": "TanStack Router",
+              "description": "Type-safe routes, built-in loaders, more complex setup. Overkill for 6 routes but good if app scales."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-03",
+          "title": "API client approach",
+          "context": "Backend has ~12 REST endpoints + 1 WebSocket. OpenAPI docs auto-generated at /docs. Could generate typed client automatically.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Manual typed fetch with hooks",
+              "description": "Simple. Write typed fetch wrappers per endpoint. Full control, minimal deps. Scales fine for 12 endpoints."
+            },
+            {
+              "id": "b",
+              "label": "Axios + auto-generated types",
+              "description": "Axios for HTTP, generate TS types from OpenAPI spec. Less manual typing, stays in sync with backend."
+            },
+            {
+              "id": "c",
+              "label": "openapi-typescript codegen",
+              "description": "Full client generation from OpenAPI spec. Zero manual API code. Magic but adds build step and generated files to manage."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "layout-nav",
+      "title": "Layout & Navigation",
+      "questions": [
+        {
+          "id": "Q-04",
+          "title": "Navigation structure",
+          "context": "Single-user app with 4-5 sections: Dashboard/Portfolio, Orders, Assets/Prices, Trade History. Trading apps typically have dense persistent nav.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Left sidebar (collapsible)",
+              "description": "Standard for trading dashboards. Fits many nav items. Collapsible to give charts more room later. Persistent visible nav."
+            },
+            {
+              "id": "b",
+              "label": "Top nav bar",
+              "description": "Simpler, good for fewer items (< 5). Works well on mobile. Less screen taken by nav. More common for general web apps."
+            },
+            {
+              "id": "c",
+              "label": "Sidebar + top bar combination",
+              "description": "Sidebar for primary nav, top bar for secondary actions (search, reset portfolio). Most flexible but more UI surface."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-05",
+          "title": "Mobile navigation pattern",
+          "context": "Per CLAUDE.md: support 375px breakpoint. Must work on mobile during commute, monitoring positions.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bottom tab bar",
+              "description": "Thumbs-friendly on mobile. Persistent visible nav. 5-tab max with label. Very common in finance/mobile apps."
+            },
+            {
+              "id": "b",
+              "label": "Hamburger drawer",
+              "description": "Standard mobile pattern. Hides nav until tapped. More screen space for content. Extra tap to navigate."
+            },
+            {
+              "id": "c",
+              "label": "Desktop sidebar collapses to icons on mobile",
+              "description": "Sidebar shrinks to icon-only dock on tablet, bottom tabs on phone. Most adaptive but more CSS work."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-06",
+          "title": "Color theme",
+          "context": "Trading apps traditionally dark mode. Light mode can cause eye strain during extended monitoring. Dark is default in most serious trading platforms.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Dark mode only",
+              "description": "Serious trading aesthetic. Easier on eyes for long sessions. Less CSS to maintain. Matches industry standard (Bloomberg, TradingView, Robinhood dark)."
+            },
+            {
+              "id": "b",
+              "label": "Dark + Light with toggle",
+              "description": "User choice. More dev time for theme system. Requires CSS variable architecture. Good accessibility practice. More CSS to maintain across phases."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "portfolio-page",
+      "title": "Portfolio Page",
+      "questions": [
+        {
+          "id": "Q-07",
+          "title": "Portfolio page layout",
+          "context": "Backend returns: cash, positions value, total value, realized/unrealized P&L, win rate, avg gain/loss, max drawdown, positions list with current prices. Charts are Phase 3.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Summary cards row + positions table below",
+              "description": "Clean hierarchy: key metrics in cards at top, detailed positions table below. Standard financial dashboard layout. Easy to scan."
+            },
+            {
+              "id": "b",
+              "label": "Full dashboard with grid of metric cards",
+              "description": "More visual. Grid of stat cards (cash, portfolio value, P&L, win rate, drawdown) in 2-3 columns. Positions table below. Feels more like a live dashboard."
+            },
+            {
+              "id": "c",
+              "label": "Minimal: key numbers header + positions focus",
+              "description": "Minimal. Just total value + P&L in header, then positions table takes main space. Chart placeholder area for Phase 3. Less visual noise."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-08",
+          "title": "Portfolio empty state",
+          "context": "Initial state: 100,000 INR cash, zero positions, no trade history.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Show cash balance + 'No positions yet' message",
+              "description": "Simple: show available cash prominently, empty state message with 'Place your first trade' CTA linking to orders page."
+            },
+            {
+              "id": "b",
+              "label": "Show full layout with zeroes",
+              "description": "Show the full portfolio layout with metric cards showing 0 values. Cash card shows 100K INR. Feels complete, not empty."
+            },
+            {
+              "id": "c",
+              "label": "Onboarding empty state with suggestion",
+              "description": "Friendly illustration. 'Your portfolio is ready. Start with 100,000 INR — try buying AAPL or BTC to see your first position.' Educational."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "orders-page",
+      "title": "Orders Page",
+      "questions": [
+        {
+          "id": "Q-09",
+          "title": "Order placement UX",
+          "context": "Order form needs: symbol, side (BUY/SELL), order type (MARKET/LIMIT/STOP_LOSS/TAKE_PROFIT), quantity, optional price/stop_price.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Side panel / drawer",
+              "description": "Slides in from right. Doesn't leave current page. User can see order list while filling form. Common in trading UIs."
+            },
+            {
+              "id": "b",
+              "label": "Modal / dialog",
+              "description": "Centered overlay. Simple, focused. Good for mobile. Blocks background until done. Less context of existing orders."
+            },
+            {
+              "id": "c",
+              "label": "Dedicated order page with form",
+              "description": "Full page for order placement. Most room for form + price preview + order validation. Clear full-screen focus. Requires navigation away."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-10",
+          "title": "Order list display",
+          "context": "Orders have statuses: PENDING, OPEN, PARTIAL_FILLED, FILLED, CANCELLED, REJECTED. User needs to see key info at a glance and take action (cancel).",
+          "options": [
+            {
+              "id": "a",
+              "label": "Table with status badges",
+              "description": "Rows: symbol, side, qty, price, status badge, date, actions. Sortable columns. Most data-dense. Standard for trading."
+            },
+            {
+              "id": "b",
+              "label": "Card list grouped by status",
+              "description": "Grouped sections: Open Orders, Filled, Cancelled. Cards show key info. More visual, less dense. Better for scanning by status."
+            },
+            {
+              "id": "c",
+              "label": "Tabs: Open vs History + table in each",
+              "description": "Two tabs. 'Open Orders' shows cancellable orders in table. 'History' shows completed orders. Clean separation of active vs done."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "real-time",
+      "title": "Real-time & Data",
+      "questions": [
+        {
+          "id": "Q-11",
+          "title": "WebSocket reconnection strategy",
+          "context": "WebSocket at /ws/prices streams all asset prices every 5s. Connection drops happen. Single-user, no auth needed.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Auto-reconnect with exponential backoff",
+              "description": "Reconnect automatically on disconnect. Backoff: 1s, 2s, 4s, 8s, cap at 30s. Show 'Reconnecting...' banner. Seamless for user."
+            },
+            {
+              "id": "b",
+              "label": "Auto-reconnect + fallback to polling",
+              "description": "Auto-reconnect as above. If WS fails after N retries, fall back to polling GET /prices/{symbol} every 10s. Resume WS when connection restores."
+            },
+            {
+              "id": "c",
+              "label": "Manual reconnect with status indicator",
+              "description": "Show connection status indicator (green/red). User clicks to retry. Simpler but user must notice disconnection."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-12",
+          "title": "Stale price visual indicator",
+          "context": "Backend marks prices as stale (is_stale: true) when provider fails but cached data exists. User should know price isn't current.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Yellow/orange warning badge next to stale price",
+              "description": "Small warning icon + 'Stale' badge next to price. Color stands out against dark theme. Standard pattern."
+            },
+            {
+              "id": "b",
+              "label": "Dim/desaturate stale prices visually",
+              "description": "Stale prices shown with reduced opacity or gray tint. Subtle but noticeable. Less intrusive than badges."
+            },
+            {
+              "id": "c",
+              "label": "Both: dimmed text + tooltip with last updated time",
+              "description": "Price dimmed on hover shows 'Last updated: X seconds ago' tooltip. Balances visibility with information. Most informative."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    },
+    {
+      "id": "polish",
+      "title": "Responsive & Polish",
+      "questions": [
+        {
+          "id": "Q-13",
+          "title": "Data density for desktop",
+          "context": "Trading apps traditionally dense (show lots of data without scrolling). General web apps prefer spacious. Tradeoff: information density vs readability. Single-user = user knows their data.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Compact (trading-dense)",
+              "description": "Smaller padding, more rows visible without scroll. Smaller font on data tables. Industry standard for trading (think Bloomberg terminal density)."
+            },
+            {
+              "id": "b",
+              "label": "Moderate (balanced)",
+              "description": "Standard web app spacing. Comfortable row heights. Not as dense as trading terminals but not as airy as marketing sites. Readable at all sizes."
+            },
+            {
+              "id": "c",
+              "label": "Spacious (modern web app)",
+              "description": "Generous padding, larger fonts, lots of whitespace. Modern SaaS feel. Less data visible per screen but more readable. May need scrolling for many positions."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        },
+        {
+          "id": "Q-14",
+          "title": "Error and 404 pages",
+          "context": "App has 4-5 routes. Single-user so 404s rare from normal use. API errors (500, timeout) more likely.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Simple toast notifications for errors",
+              "description": "API errors show as toast notifications (top-right). 404 redirects to portfolio. Minimal, keeps user in flow. Less surface area to maintain."
+            },
+            {
+              "id": "b",
+              "label": "Inline error states per section",
+              "description": "Failed API calls show inline error banner in the affected section (portfolio, orders). Retry button. 404 shows branded page with nav links."
+            },
+            {
+              "id": "c",
+              "label": "Full error page with retry + status info",
+              "description": "Dedicated error display with error details, retry button, connection status indicator. More dev work but thorough error handling."
+            }
+          ],
+          "answer": null,
+          "chat_more": "",
+          "status": "unanswered"
+        }
+      ]
+    }
+  ]
+}

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Override root .gitignore's lib/ exclusion — src/lib/ is source code
+!src/lib/

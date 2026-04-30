@@ -2,9 +2,10 @@ import { cn } from "@/lib/utils";
 
 interface SkeletonProps {
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, style }: SkeletonProps) {
   return (
     <div
       className={cn(
@@ -12,6 +13,7 @@ export function Skeleton({ className }: SkeletonProps) {
         "motion-reduce:animate-none",
         className
       )}
+      style={style}
     />
   );
 }

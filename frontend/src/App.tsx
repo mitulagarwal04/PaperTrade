@@ -2,8 +2,11 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomTabBar from "@/components/layout/BottomTabBar";
 import Header from "@/components/layout/Header";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export default function App() {
+  useWebSocket();
+
   return (
     <div className="flex h-screen bg-background text-primary">
       <Sidebar />

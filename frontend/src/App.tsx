@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomTabBar from "@/components/layout/BottomTabBar";
 import Header from "@/components/layout/Header";
+import { WsReconnectBanner } from "@/components/shared/WsReconnectBanner";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
         <Header />
+            <WsReconnectBanner />
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>

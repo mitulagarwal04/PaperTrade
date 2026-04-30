@@ -1,1 +1,20 @@
-/* Placeholder - will be replaced in Task 2 with Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile padding for bottom tab bar (56px tab bar + 16px breathing room) */
+@media (max-width: 1023px) {
+  main {
+    padding-bottom: 72px;
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

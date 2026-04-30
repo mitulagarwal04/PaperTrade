@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { usePlaceOrder } from "@/hooks/useOrderMutations";
+import type { PlaceOrderParams } from "@/hooks/useOrderMutations";
 import { usePriceStore } from "@/stores/priceStore";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -55,16 +56,16 @@ export function OrderForm({ open, onClose }: OrderFormProps) {
       return;
     }
 
-    const params: Record<string, unknown> = {
+    const params: PlaceOrderParams = {
       symbol: sym,
       side,
-      order_type: orderType,
+      order_type: orderType as PlaceOrderParams["order_type"],
       quantity: qty,
     };
     if (orderType === "LIMIT" && price) params.price = parseFloat(price);
     if (["STOP_LOSS", "TAKE_PROFIT"].includes(orderType) && stopPrice) params.stop_price = parseFloat(stopPrice);
 
-    placeOrder.mutate(params as any, {
+    placeOrder.mutate(params, {
       onSuccess: () => {
         toast({
           title: "Order placed",

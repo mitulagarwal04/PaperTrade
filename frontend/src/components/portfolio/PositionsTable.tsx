@@ -19,24 +19,20 @@ export function PositionsTable() {
   const [sortField, setSortField] = useState<SortField>("market_value_inr");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  // Enrich positions with live WS prices
+  // Enrich positions with live WS prices for staleness detection only
   const enrichedPositions = useMemo(() => {
     if (!positions) return [];
     return positions.map((pos) => {
       const live = livePrices[pos.symbol];
-      const currentPrice = live?.price ?? pos.current_price;
       const staleness = live ? isPriceStale(live.last_updated) : "fresh";
-      const marketValue = Number(pos.quantity) * Number(currentPrice);
-      const unrealizedPnl = marketValue - Number(pos.total_cost_inr);
-      const pnlPercent = pos.total_cost_inr > 0
-        ? (unrealizedPnl / Number(pos.total_cost_inr)) * 100
-        : 0;
       return {
         ...pos,
-        displayPrice: currentPrice,
-        displayMarketValue: marketValue,
-        displayPnl: unrealizedPnl,
-        pnlPercent,
+        displayPrice: pos.current_price_inr,
+        displayMarketValue: pos.market_value_inr,
+        displayPnl: pos.unrealized_pnl_inr,
+        pnlPercent: pos.total_cost_inr > 0
+          ? (pos.unrealized_pnl_inr / Number(pos.total_cost_inr)) * 100
+          : 0,
         isStale: staleness !== "fresh",
       };
     });

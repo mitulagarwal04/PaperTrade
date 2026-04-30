@@ -25,6 +25,7 @@ export default function SettingsPage() {
     try {
       await api.post("/api/v1/portfolio/reset", { confirm: true });
       setResetDone(true);
+      setShowReset(false);
       queryClient.invalidateQueries({ queryKey: ["portfolio"] });
       queryClient.invalidateQueries({ queryKey: ["positions"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });

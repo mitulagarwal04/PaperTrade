@@ -8,7 +8,6 @@ export function useWebSocket() {
   const {
     setWsStatus,
     updatePrices,
-    reconnectAttempt,
     incrementReconnect,
     resetReconnect,
   } = usePriceStore();
@@ -45,7 +44,8 @@ export function useWebSocket() {
   };
 
   const scheduleReconnect = () => {
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttempt), MAX_BACKOFF);
+    const attempt = usePriceStore.getState().reconnectAttempt;
+    const delay = Math.min(1000 * Math.pow(2, attempt), MAX_BACKOFF);
     timerRef.current = setTimeout(() => {
       incrementReconnect();
       connect();

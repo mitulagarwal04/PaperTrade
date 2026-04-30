@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "@/components/layout/Sidebar";
 import BottomTabBar from "@/components/layout/BottomTabBar";
 import Header from "@/components/layout/Header";
+import { Toaster } from "@/components/ui/toaster";
 import { WsReconnectBanner } from "@/components/shared/WsReconnectBanner";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
@@ -19,6 +20,7 @@ export default function App() {
         </main>
       </div>
       <BottomTabBar />
+      <Toaster />
     </div>
   );
 }

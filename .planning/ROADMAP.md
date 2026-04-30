@@ -8,8 +8,7 @@
 
 - [ ] **Phase 1: Data Infrastructure** - Reliable real-time multi-asset market data with caching and fault tolerance.
 - [x] **Phase 2: Trading & Portfolio** - Order placement, management, and portfolio tracking.
-- [ ] **Phase 2.5: Frontend Application** - Full frontend shell: design system, layout, portfolio view, order management, asset prices, WebSocket real-time integration.
-- [ ] **Phase 2.5: Frontend Application** - Full frontend shell: design system, layout, portfolio view, order management, asset prices, WebSocket real-time integration.
+- [x] **Phase 2.5: Frontend Application** - Full frontend shell: design system, layout, portfolio view, order management, asset prices, WebSocket real-time integration.
 - [ ] **Phase 3: Charts & Technical Analysis** - Interactive charts with indicators and drawing tools.
 - [ ] **Phase 4: External Signals** - Integration of news, social media, and insider data.
 - [ ] **Phase 5: AI Advisor** - AI recommendations with explanations and confidence.
@@ -50,6 +49,7 @@
   3. Real-time prices stream via WebSocket and update UI every 5 seconds without page refresh.
   4. Application works on mobile (375px) through desktop (1440px) with appropriate nav patterns.
   5. Stale prices are visually indicated with dimming and tooltip showing last update time.
+**Plans**: 6 plans in 3 waves
 **UI hint**: yes (this IS the UI phase)
 
 ### Phase 3: Charts & Technical Analysis
@@ -93,7 +93,7 @@
 |-------|----------------|--------|-----------|
 | 1. Data Infrastructure | 0/0 | Not started | - |
 | 2. Trading & Portfolio | 0/0 | Complete | - |
-| 2.5. Frontend Application | 0/0 | Context gathered | - |
+| 2.5. Frontend Application | 6/6 | Complete | 2026-05-01 |
 | 3. Charts & Technical Analysis | 0/0 | Not started | - |
 | 4. External Signals | 0/0 | Not started | - |
 | 5. AI Advisor | 0/0 | Not started | - |

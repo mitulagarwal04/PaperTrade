@@ -33,7 +33,12 @@
       "mcp__plugin_claude-mem_mcp-search__get_observations",
       "Bash(pkill -f uvicorn)",
       "Bash(lsof -ti:8000)",
-      "Bash(xargs kill *)"
+      "Bash(xargs kill *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\" http://localhost:5173)",
+      "Bash(timeout 3 websocat ws://localhost:5173/ws)",
+      "Bash(python3 -c ' *)",
+      "Bash(echo \"WS test: $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/ws\\) \\(upgrade needed\\)\")"
     ]
   }
 }

@@ -1,13 +1,14 @@
 # PaperTrade Project Roadmap
 
-**Phases:** 5
+**Phases:** 6
 **Granularity:** standard
 **Coverage:** 24/24 requirements mapped ✓
 
 ## Phases
 
 - [ ] **Phase 1: Data Infrastructure** - Reliable real-time multi-asset market data with caching and fault tolerance.
-- [ ] **Phase 2: Trading & Portfolio** - Order placement, management, and portfolio tracking.
+- [x] **Phase 2: Trading & Portfolio** - Order placement, management, and portfolio tracking.
+- [x] **Phase 2.5: Frontend Application** - Full frontend shell: design system, layout, portfolio view, order management, asset prices, WebSocket real-time integration.
 - [ ] **Phase 3: Charts & Technical Analysis** - Interactive charts with indicators and drawing tools.
 - [ ] **Phase 4: External Signals** - Integration of news, social media, and insider data.
 - [ ] **Phase 5: AI Advisor** - AI recommendations with explanations and confidence.
@@ -37,6 +38,19 @@
   5. The portfolio summary shows net worth breakdown and key performance metrics (e.g., total gain/loss, win rate).
 **Plans**: TBD
 **UI hint**: yes
+
+### Phase 2.5: Frontend Application
+**Goal**: Users can view their portfolio, place and manage orders, and see real-time asset prices through a polished dark-mode web UI.
+**Depends on**: Phase 1, Phase 2
+**Requirements**: UI-01, UI-02, UI-03
+**Success Criteria** (what must be TRUE):
+  1. User sees dashboard with cash balance, portfolio summary, positions, and performance metrics on load.
+  2. User can view open orders, place new orders via side panel, and cancel open orders.
+  3. Real-time prices stream via WebSocket and update UI every 5 seconds without page refresh.
+  4. Application works on mobile (375px) through desktop (1440px) with appropriate nav patterns.
+  5. Stale prices are visually indicated with dimming and tooltip showing last update time.
+**Plans**: 6 plans in 3 waves
+**UI hint**: yes (this IS the UI phase)
 
 ### Phase 3: Charts & Technical Analysis
 **Goal**: Users can analyze asset price movements using interactive charts with technical indicators and drawing tools.
@@ -78,7 +92,8 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Infrastructure | 0/0 | Not started | - |
-| 2. Trading & Portfolio | 0/0 | Not started | - |
+| 2. Trading & Portfolio | 0/0 | Complete | - |
+| 2.5. Frontend Application | 6/6 | Complete | 2026-05-01 |
 | 3. Charts & Technical Analysis | 0/0 | Not started | - |
 | 4. External Signals | 0/0 | Not started | - |
 | 5. AI Advisor | 0/0 | Not started | - |

@@ -10,6 +10,7 @@ from app.database import init_db
 from app.api.routes.prices import router as prices_router
 from app.api.routes.orders import router as orders_router
 from app.api.routes.portfolio import router as portfolio_router
+from app.api.routes.charts import router as charts_router
 from app.websocket.manager import ConnectionManager
 from app.cache.manager import CacheManager
 from app.providers.registry import ProviderRegistry
@@ -155,6 +156,7 @@ def create_app() -> FastAPI:
     app.include_router(prices_router, prefix="/api/v1")
     app.include_router(orders_router, prefix="/api/v1")
     app.include_router(portfolio_router, prefix="/api/v1")
+    app.include_router(charts_router, prefix="/api/v1")
 
     @app.get("/")
     async def root():

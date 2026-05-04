@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { IChartApi, ISeriesApi, Time } from 'lightweight-charts';
 import { usePriceStore } from '@/stores/priceStore';
@@ -12,6 +12,13 @@ import { ChartSkeleton } from '@/components/chart/ChartSkeleton';
 import { ErrorBanner } from '@/components/shared/ErrorBanner';
 import { IndicatorDropdown } from '@/components/chart/IndicatorDropdown';
 import { IndicatorChip } from '@/components/chart/IndicatorChip';
+import { DrawingToolbar } from '@/components/chart/drawingTools/DrawingToolbar';
+import { DrawingCanvas } from '@/components/chart/drawingTools/DrawingCanvas';
+import {
+  type Drawing, type DrawingTool, type DrawingHistory,
+  createDrawingHistory, pushDrawingState, undoDrawingState, redoDrawingState,
+  saveDrawings, loadDrawings,
+} from '@/components/chart/drawingTools/drawingState';
 import { calcSMA, calcEMA, calcRSI, calcBollingerBands, calcMACD, calcVolumeProfile } from '@/lib/indicatorUtils';
 import { CHART_INDICATOR_COLORS } from '@/lib/constants';
 import { rangeToInterval } from '@/lib/candleUtils';
@@ -28,6 +35,111 @@ export default function ChartPage() {
   const { data, isPending, isError, error, refetch } = useChartData(symbol || '', range);
   const prices = usePriceStore((s) => s.prices);
   const priceData = symbol ? prices[symbol] : undefined;
+
+  // --- Drawing state ---
+  const [activeTool, setActiveTool] = useState<DrawingTool>(null);
+  const [drawings, setDrawings] = useState<Drawing[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const historyRef = useRef<DrawingHistory>(createDrawingHistory());
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
+
+  // ResizeObserver to track chart container dimensions for DrawingCanvas
+  useEffect(() => {
+    const el = chartContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setChartSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Load drawings from localStorage on mount and when symbol changes
+  useEffect(() => {
+    if (!symbol) return;
+    const saved = loadDrawings(symbol);
+    setDrawings(saved);
+    setSelectedId(null);
+    setActiveTool(null);
+    historyRef.current = createDrawingHistory();
+  }, [symbol]);
+
+  // Debounced save to localStorage when drawings change
+  useEffect(() => {
+    if (!symbol) return;
+    const timer = setTimeout(() => {
+      saveDrawings(symbol, drawings);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [drawings, symbol]);
+
+  // Keyboard shortcuts: Delete/Backspace to remove selected, Escape to deselect
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActiveTool(null);
+        setSelectedId(null);
+      }
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIdRef.current) {
+        const idToDelete = selectedIdRef.current;
+        setDrawings((prev) => {
+          historyRef.current = pushDrawingState(historyRef.current, prev);
+          return prev.filter((d) => d.id !== idToDelete);
+        });
+        setSelectedId(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleDrawingsChange = useCallback((newDrawings: Drawing[]) => {
+    setDrawings((prev) => {
+      historyRef.current = pushDrawingState(historyRef.current, prev);
+      return newDrawings;
+    });
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    setDrawings((prev) => {
+      const result = undoDrawingState(historyRef.current, prev);
+      if (!result) return prev;
+      historyRef.current = result.history;
+      return result.drawings;
+    });
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    setDrawings((prev) => {
+      const result = redoDrawingState(historyRef.current, prev);
+      if (!result) return prev;
+      historyRef.current = result.history;
+      return result.drawings;
+    });
+  }, []);
+
+  const handleDeleteSelected = useCallback(() => {
+    setSelectedId((prevId) => {
+      if (!prevId) return prevId;
+      setDrawings((prev) => {
+        historyRef.current = pushDrawingState(historyRef.current, prev);
+        return prev.filter((d) => d.id !== prevId);
+      });
+      return null;
+    });
+  }, []);
+
+  const canUndo = historyRef.current.past.length > 0;
+  const canRedo = historyRef.current.future.length > 0;
 
   // --- Indicator state ---
   const [activeIndicators, setActiveIndicators] = useState<string[]>([]);
@@ -244,8 +356,22 @@ export default function ChartPage() {
         ))}
       </div>
 
+      {/* Drawing toolbar — right-aligned above chart */}
+      <div className="flex justify-end">
+        <DrawingToolbar
+          activeTool={activeTool}
+          onToolChange={setActiveTool}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          onDeleteSelected={handleDeleteSelected}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          hasSelection={selectedId !== null}
+        />
+      </div>
+
       {/* Chart area per UI-SPEC states */}
-      <div className="bg-surface-1 border border-border rounded-lg overflow-hidden">
+      <div ref={chartContainerRef} className="bg-surface-1 border border-border rounded-lg overflow-hidden relative">
         {isPending && <ChartSkeleton />}
 
         {isError && (
@@ -274,11 +400,25 @@ export default function ChartPage() {
         )}
 
         {!isPending && !isError && candles.length > 0 && (
-          <ChartContainer
-            data={candles}
-            chartType={chartType}
-            onInit={handleChartInit}
-          />
+          <>
+            <ChartContainer
+              data={candles}
+              chartType={chartType}
+              onInit={handleChartInit}
+            />
+            {chartApiRef.current && chartSize.width > 0 && (
+              <DrawingCanvas
+                chartApi={chartApiRef.current}
+                activeTool={activeTool}
+                drawings={drawings}
+                onDrawingsChange={handleDrawingsChange}
+                selectedId={selectedId}
+                onSelectDrawing={setSelectedId}
+                width={chartSize.width}
+                height={chartSize.height || 500}
+              />
+            )}
+          </>
         )}
       </div>
 

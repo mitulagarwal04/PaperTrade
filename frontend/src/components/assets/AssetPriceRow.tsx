@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { usePriceStore } from "@/stores/priceStore";
 import { isPriceStale } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -10,11 +11,15 @@ interface AssetPriceRowProps {
 }
 
 export function AssetPriceRow({ symbol, name, type }: AssetPriceRowProps) {
+  const navigate = useNavigate();
   const priceData = usePriceStore((state) => state.prices[symbol]);
 
   if (!priceData) {
     return (
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle">
+      <div
+        className="flex items-center justify-between px-3 py-2 border-b border-border-subtle group relative cursor-pointer hover:bg-surface-2/50 transition-colors duration-150"
+        onClick={() => navigate(`/chart/${symbol}`)}
+      >
         <div>
           <p className="text-sm font-medium">{symbol}</p>
           <p className="text-xs text-muted">{name} &middot; {type}</p>
@@ -34,7 +39,10 @@ export function AssetPriceRow({ symbol, name, type }: AssetPriceRowProps) {
   }).format(priceData.price);
 
   return (
-    <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle group relative">
+    <div
+      className="flex items-center justify-between px-3 py-2 border-b border-border-subtle group relative cursor-pointer hover:bg-surface-2/50 transition-colors duration-150"
+      onClick={() => navigate(`/chart/${symbol}`)}
+    >
       <div>
         <p className={cn("text-sm font-medium", staleness !== "fresh" && "opacity-50")}>
           {symbol}

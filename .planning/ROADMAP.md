@@ -9,7 +9,7 @@
 - [ ] **Phase 1: Data Infrastructure** - Reliable real-time multi-asset market data with caching and fault tolerance.
 - [x] **Phase 2: Trading & Portfolio** - Order placement, management, and portfolio tracking.
 - [x] **Phase 2.5: Frontend Application** - Full frontend shell: design system, layout, portfolio view, order management, asset prices, WebSocket real-time integration.
-- [ ] **Phase 3: Charts & Technical Analysis** - Interactive charts with indicators and drawing tools.
+- [x] **Phase 3: Charts & Technical Analysis** - Interactive charts with indicators and drawing tools.
 - [ ] **Phase 4: External Signals** - Integration of news, social media, and insider data.
 - [ ] **Phase 5: AI Advisor** - AI recommendations with explanations and confidence.
 
@@ -61,8 +61,15 @@
   2. User can add technical indicators (e.g., moving averages, RSI, MACD) to the chart, which update live.
   3. User can draw trendlines, annotations, and other shapes on the chart, and they persist during the session.
   4. User can switch between chart types and customize timeframes.
-**Plans**: TBD
+**Plans**: 5 plans in 5 waves
 **UI hint**: yes
+
+Plans:
+- [x] 03-01-PLAN.md -- Backend OHLC endpoint + frontend types, candle utils, indicator utils, lightweight-charts install, route registration
+- [x] 03-02-PLAN.md -- ChartContainer React wrapper, useChartData/useTimeframe hooks, TimeframeSelector, PriceInfoBar
+- [x] 03-03-PLAN.md -- ChartPage composition, ChartSkeleton, useCandleAggregator, AssetPriceRow navigation, loading/error/empty states, real-time WS updates
+- [x] 03-04-PLAN.md -- Indicator calculations (SMA/EMA/RSI/MACD/BB/Volume), IndicatorDropdown, IndicatorChip, overlay series management
+- [x] 03-05-PLAN.md -- Drawing tools: drawingState (localStorage + undo/redo), DrawingCanvas (SVG overlay), DrawingToolbar, ChartPage integration
 
 ### Phase 4: External Signals
 **Goal**: The system aggregates and displays external market sentiment and insider information to inform trading.
@@ -94,6 +101,6 @@
 | 1. Data Infrastructure | 0/0 | Not started | - |
 | 2. Trading & Portfolio | 0/0 | Complete | - |
 | 2.5. Frontend Application | 6/6 | Complete | 2026-05-01 |
-| 3. Charts & Technical Analysis | 0/0 | Not started | - |
+| 3. Charts & Technical Analysis | 5/5 | Complete | 2026-05-05 |
 | 4. External Signals | 0/0 | Not started | - |
 | 5. AI Advisor | 0/0 | Not started | - |

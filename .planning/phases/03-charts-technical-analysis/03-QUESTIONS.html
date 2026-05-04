@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 3: Charts & Technical Analysis — Discussion Questions</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:#0f1117;color:#e2e8f0;padding:24px;line-height:1.5}
+.container{max-width:1200px;margin:0 auto}
+h1{font-size:1.5rem;font-weight:700;margin-bottom:4px;color:#f1f5f9}
+.subtitle{font-size:0.875rem;color:#94a3b8;margin-bottom:24px}
+.stats-bar{display:flex;gap:24px;align-items:center;padding:16px 20px;background:#1a1d27;border:1px solid #2d3143;border-radius:10px;margin-bottom:24px;flex-wrap:wrap}
+.stat{font-size:0.875rem;color:#94a3b8}.stat strong{color:#e2e8f0}
+.progress-track{flex:1;min-width:100px;height:8px;background:#2d3143;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:#22c55e;border-radius:4px;transition:width .3s;width:0%}
+.section{margin-bottom:20px;border:1px solid #2d3143;border-radius:10px;overflow:hidden;background:#1a1d27}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#1e2130;cursor:pointer;user-select:none;transition:background .15s}
+.section-header:hover{background:#262a3a}
+.section-title{font-weight:600;font-size:0.95rem;color:#e2e8f0}
+.section-meta{font-size:0.8rem;color:#94a3b8}
+.toggle-icon{font-size:0.75rem;color:#64748b;transition:transform .2s}.toggle-icon.open{transform:rotate(90deg)}
+.section-content{padding:16px 20px;display:block}
+.section-content.closed{display:none}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.card{border:1px solid #2d3143;border-radius:8px;padding:16px;background:#11131e;transition:border-color .2s,background .2s}
+.card.answered{border:2px solid #22c55e;background:#0f1f14}
+.card-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.qid{font-size:0.7rem;font-weight:700;color:#22c55e;background:#1a3a1a;padding:2px 7px;border-radius:4px;white-space:nowrap;margin-top:1px}
+.card-title{font-weight:600;font-size:0.9rem;color:#e2e8f0;line-height:1.3}
+.context-text{font-size:0.8rem;color:#64748b;margin-bottom:12px;font-style:italic;line-height:1.4}
+.options{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.option{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid #2d3143;border-radius:6px;cursor:pointer;transition:background .15s,border-color .15s}
+.option:hover{background:#1e2130}
+.option input[type="radio"]{margin-top:3px;accent-color:#22c55e;flex-shrink:0}
+.option-label{font-weight:500;font-size:0.85rem;color:#e2e8f0}
+.option-desc{font-size:0.78rem;color:#64748b;margin-top:1px;line-height:1.3}
+.chat-area{border:1px solid #2d3143;border-radius:6px;padding:8px;width:100%;background:#0d0f19;color:#e2e8f0;font-size:0.82rem;font-family:inherit;resize:vertical;min-height:56px;transition:border-color .2s}
+.chat-area::placeholder{color:#475569}
+.chat-area.active{border-color:#f97316;border-width:2px}
+.btn-row{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+.btn{padding:10px 22px;border-radius:8px;font-weight:600;font-size:0.875rem;cursor:pointer;border:none;transition:background .15s}
+.btn-primary{background:#22c55e;color:#0f1117}.btn-primary:hover{background:#16a34a}
+.btn-secondary{background:#2d3143;color:#e2e8f0}.btn-secondary:hover{background:#3b3f58}
+.btn-download{background:#2563eb;color:#fff}.btn-download:hover{background:#1d4ed8}
+.instructions{font-size:0.82rem;color:#94a3b8;background:#1e2130;padding:14px 18px;border-radius:8px;margin:18px 0;border-left:3px solid #22c55e}
+.instructions code{background:#2d3143;padding:1px 5px;border-radius:3px;font-size:0.8rem}
+@media(max-width:600px){.card-grid{grid-template-columns:1fr}.stats-bar{flex-direction:column;align-items:flex-start;gap:10px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Phase 3: Charts &amp; Technical Analysis</h1>
+<p class="subtitle">Discussion Questions — answer at your own pace, then say "refresh" or "finalize" to Claude</p>
+
+<div class="stats-bar">
+<span class="stat">Total: <strong id="total">10</strong></span>
+<span class="stat">Answered: <strong id="answered">0</strong></span>
+<span class="stat">Remaining: <strong id="remaining">10</strong></span>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="btn-row">
+<button class="btn btn-primary" onclick="saveAnswers()">Save answers</button>
+<button class="btn btn-download" onclick="downloadJSON()">Download JSON</button>
+</div>
+
+<div class="instructions">
+After answering, click <strong>"Save answers"</strong> (or download the JSON and replace the original file).<br>
+Then return to Claude and say <code>"refresh"</code> to process your answers, or <code>"finalize"</code> when done.
+</div>
+
+<div id="sections"></div>
+
+<div class="btn-row">
+<button class="btn btn-primary" onclick="saveAnswers()">Save answers</button>
+<button class="btn btn-download" onclick="downloadJSON()">Download JSON</button>
+</div>
+</div>
+
+<script>
+const data = JSON.parse(document.getElementById('__DATA__').textContent);
+let state = data;
+
+function render(){
+  let total=0, answered=0;
+  state.sections.forEach(s=>s.questions.forEach(q=>{total++; if(q.answer)answered++}));
+  state.stats.total=total; state.stats.answered=answered; state.stats.remaining=total-answered;
+  document.getElementById('total').textContent=total;
+  document.getElementById('answered').textContent=answered;
+  document.getElementById('remaining').textContent=total-answered;
+  const pct=total?Math.round(answered/total*100):0;
+  document.getElementById('progressFill').style.width=pct+'%';
+
+  const container=document.getElementById('sections');
+  container.innerHTML='';
+  state.sections.forEach(section=>{
+    const secAnswered=section.questions.filter(q=>q.answer).length;
+    const secDiv=document.createElement('div'); secDiv.className='section';
+    const header=document.createElement('div'); header.className='section-header';
+    header.innerHTML=`<div><div class="section-title">${section.title}</div><div class="section-meta">${secAnswered}/${section.questions.length} answered</div></div><span class="toggle-icon open">▶</span>`;
+    const content=document.createElement('div'); content.className='section-content';
+    const grid=document.createElement('div'); grid.className='card-grid';
+    section.questions.forEach(q=>{
+      const card=document.createElement('div'); card.className='card'+(q.answer?' answered':'');
+      card.id='card-'+q.id;
+      card.innerHTML=`<div class="card-header"><span class="qid">${q.id}</span><div class="card-title">${q.title}</div></div><div class="context-text">${q.context || ''}</div><div class="options"></div><textarea class="chat-area" placeholder="Add context, nuance, or clarification for this question..." data-qid="${q.id}">${q.chat_more||''}</textarea>`;
+      const optsDiv=card.querySelector('.options');
+      q.options.forEach(opt=>{
+        const optDiv=document.createElement('div'); optDiv.className='option';
+        const checked=q.answer===opt.id?'checked':'';
+        optDiv.innerHTML=`<input type="radio" name="${q.id}" value="${opt.id}" ${checked}><div><div class="option-label">${opt.label}</div><div class="option-desc">${opt.description}</div></div>`;
+        optDiv.querySelector('input').addEventListener('change',function(){q.answer=this.value;card.classList.toggle('answered',!!q.answer);render();});
+        optsDiv.appendChild(optDiv);
+      });
+      const ta=card.querySelector('.chat-area');
+      ta.addEventListener('input',function(){q.chat_more=this.value;this.classList.toggle('active',this.value.trim().length>0);});
+      if(ta.value.trim())ta.classList.add('active');
+      grid.appendChild(card);
+    });
+    content.appendChild(grid);
+    secDiv.appendChild(header);
+    secDiv.appendChild(content);
+    header.addEventListener('click',function(){content.classList.toggle('closed');this.querySelector('.toggle-icon').classList.toggle('open');});
+    container.appendChild(secDiv);
+  });
+}
+
+function saveAnswers(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  if('showSaveFilePicker'in window&&window.showSaveFilePicker){
+    showSaveFilePicker({suggestedName:'03-QUESTIONS.json',types:[{accept:{'application/json':['.json']}}]}).then(fh=>fh.createWritable()).then(ws=>ws.write(blob).then(()=>ws.close())).then(()=>alert('Saved! Tell Claude "refresh" to process.')).catch(()=>downloadJSON());
+  }else downloadJSON();
+}
+
+function downloadJSON(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='03-QUESTIONS.json';a.click();
+  URL.revokeObjectURL(url);
+  alert('JSON downloaded. Replace the original file, then tell Claude "refresh".');
+}
+
+render();
+</script>
+<script id="__DATA__" type="application/json">{"phase":"03-charts-technical-analysis","generated_at":"2026-05-04T17:08:00Z","stats":{"total":10,"answered":0,"chat_more":0,"remaining":10},"sections":[{"id":"chart-library-types","title":"Chart Library & Types","questions":[{"id":"Q-01","title":"Which charting library?","context":"Need interactive financial charts. Existing frontend: React 18 + TailwindCSS (dark mode v1). TradingView Lightweight Charts is purpose-built for financial charts (candlestick, indicators built-in), ~45KB gzipped, industry standard for trading UIs. Not React-native (imperative API) — needs thin wrapper. Chart.js has candlestick via plugin, React wrapper available. Recharts has NO built-in candlestick — would need custom SVG work.","options":[{"id":"a","label":"TradingView Lightweight Charts","description":"Purpose-built financial charting. Candlestick, line, bar, area out of box. Built-in MA, RSI, MACD indicators. ~45KB gzipped. Industry standard for trading UIs. Not React-native — needs thin React wrapper component."},{"id":"b","label":"Chart.js + react-chartjs-2","description":"General-purpose charting with candlestick plugin (chartjs-chart-financial). React wrapper via react-chartjs-2. Larger bundle ~60KB + plugins. Less polished financial chart UX than TradingView."},{"id":"c","label":"Recharts","description":"Pure React charts. Clean API, easy integration. NO built-in candlestick — would need custom SVG implementation. Best for standard charts only. Would require significant custom work for financial features."}],"answer":null,"chat_more":"","status":"unanswered"},{"id":"Q-02","title":"Which chart types for v1?","context":"Candlestick is the standard for financial analysis. Line charts show simpler trend views. Bar charts show OHLC data. Area charts show fills. More types = more dev time.","options":[{"id":"a","label":"Candlestick only","description":"Standard OHLC candlestick chart. Simplest to implement. Add other chart types in later phases."},{"id":"b","label":"Candlestick + Line","description":"Candlestick for detailed analysis + line chart for quick trend views. Both supported natively by TradingView LW. Good balance of utility and dev cost."},{"id":"c","label":"Full: Candle + Line + Bar + Area","description":"Candlestick (primary), line, OHLC bar, and area charts. Full flexibility. More UI complexity for chart type selector. Most dev time."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"chart-page-ux","title":"Chart Page UX","questions":[{"id":"Q-03","title":"How do users open a chart?","context":"Assets currently listed as text rows in AssetsPage. Existing navigation patterns: React Router v6 pages (Dashboard, Portfolio, Orders, Assets, Settings), right side panel (order form), and dialog modals (cancel order). AssetPriceRow has no click interaction yet.","options":[{"id":"a","label":"Full dedicated chart page","description":"Click asset symbol → navigate to /chart/{symbol}. Full screen chart with timeframe controls, indicator toggles. Standard brokerage pattern (Zerodha Kite, TradingView). Most real estate for analysis."},{"id":"b","label":"Slide-out side panel","description":"Click asset → chart opens in right side panel (same pattern as existing order form). Quick view without leaving current page. Less space for indicators/tools on small screens."},{"id":"c","label":"Modal / overlay","description":"Chart opens in centered overlay on any page. Moderate space. Blocks background interaction. Middle ground but unusual for trading apps."}],"answer":null,"chat_more":"","status":"unanswered"},{"id":"Q-04","title":"Mobile chart behavior?","context":"Existing frontend is responsive with left sidebar (desktop) to bottom tab bar (mobile). Small screens + touch interactions need special consideration. TradingView LW supports touch gestures natively.","options":[{"id":"a","label":"Same page, responsive","description":"Chart page adapts to screen width. Same full-screen chart on mobile with touch-optimized controls. Simpler codebase — one component for all sizes."},{"id":"b","label":"Simplified mobile view","description":"Mobile gets stripped-down chart (candlestick only, fewer indicators, larger touch targets). Desktop full-featured. More dev work but better UX per platform."},{"id":"c","label":"Charts not on mobile (v1)","description":"Chart page redirects or shows 'Open on desktop' on mobile. Simplest approach. Add mobile support later."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"technical-indicators","title":"Technical Indicators","questions":[{"id":"Q-05","title":"Which indicators in v1?","context":"TradingView Lightweight Charts has built-in MA, RSI, MACD as series overlays. Other indicators (Bollinger Bands, Volume, Stochastic) need custom calc or TA-Lib server-side. More indicators = more dev time + UI complexity.","options":[{"id":"a","label":"Minimal: MA + RSI","description":"Moving Averages (SMA/EMA) + RSI. Quick to implement (built into TradingView LW). Covers basic trend + momentum analysis. Least UI complexity."},{"id":"b","label":"Standard: MA + RSI + MACD","description":"Moving Averages, RSI, and MACD. Covers trend-following, momentum, and trend strength. All built into TradingView LW. Balanced v1 scope."},{"id":"c","label":"Full: MA + RSI + MACD + Bollinger + Volume","description":"Everything available in TradingView LW out of box. Bollinger Bands + Volume for volatility/confirmation. More UI complexity (indicator selector, config panels). Most dev time but most complete."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"drawing-tools","title":"Drawing Tools","questions":[{"id":"Q-06","title":"Drawing tools scope for v1?","context":"Drawing tools are a success criterion (SC-3: 'draw trendlines, annotations, and other shapes, persisting during session'). TradingView LW has drawing plugin but state persistence adds complexity.","options":[{"id":"a","label":"Skip — read-only charts","description":"No drawing tools. Users view charts and indicators but not annotate. Simplest. TA-03 and SC-3 deferred to later phase."},{"id":"b","label":"Basic: trendlines + horizontal lines","description":"Trendline tool + horizontal/vertical lines. Most common drawing needs. Skip text annotations and complex shapes. In-session persistence only."},{"id":"c","label":"Full drawing suite","description":"Trendlines, horizontal/vertical lines, ray lines, text annotations, and session persistence. Full parity with TA-03 requirement. Significant dev effort."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"timeframes-data","title":"Timeframes & Data Source","questions":[{"id":"Q-07","title":"Which timeframe presets for v1?","context":"Backend fetches historical data via yfinance ticker.history(). Available intervals: 1m-1mo. Not all intervals for all periods (1m only for last 7 days). More presets = more API calls + cache complexity.","options":[{"id":"a","label":"Minimal: 1D, 1W, 1M, 3M, 1Y","description":"Most common timeframes. 1D=5m candles, 1W=15m, 1M/3M=1h, 1Y=1d. Simple button selector. Fastest to implement and cache."},{"id":"b","label":"Standard: 1D, 5D, 1M, 3M, 6M, 1Y, 5Y","description":"Adds 5D, 6M, 5Y. Standard brokerage range. More data fetching — 5Y at daily candles. More caching needed."},{"id":"c","label":"Full: presets + custom date range","description":"Timeframe buttons + date range picker for custom start/end. Most flexible. Adds date picker UI and complex backend query logic."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"real-time-backend","title":"Real-time Updates & Backend","questions":[{"id":"Q-08","title":"How should charts update in real-time?","context":"Existing WS at /ws/prices broadcasts every 5s: {type:'prices', data:{SYMBOL:{price,currency,source}}}. TradingView LW supports real-time via chart.update(). Can reuse existing WS or create chart-specific stream.","options":[{"id":"a","label":"Manual refresh only","description":"Chart loads static historical data. User clicks 'Refresh' or changes timeframe for latest. Simplest. No auto-update logic needed."},{"id":"b","label":"Auto-refresh on interval","description":"Chart polls latest data every N seconds (e.g., 10s matching REFETCH_INTERVAL). No WS needed. Consistent with existing useQuery pattern."},{"id":"c","label":"Live WebSocket updates","description":"Chart subscribes to WS stream, updates current candle in real-time. Auto-scrolls at latest. Most engaging. TradingView LW supports natively. Most complex (candle aggregation)."}],"answer":null,"chat_more":"","status":"unanswered"},{"id":"Q-09","title":"Where should candle data be calculated?","context":"yfinance ticker.history() returns OHLCV. Existing pattern: market data proxied through backend with caching. No chart endpoint exists. Two architectures with caching vs rate-limit tradeoffs.","options":[{"id":"a","label":"Backend proxy: new /api/v1/charts endpt","description":"Backend fetches OHLCV from yfinance, caches, returns standard format. Consistent with existing arch. Cache reduces yfinance rate limit hits. More backend work."},{"id":"b","label":"Frontend-direct yfinance call","description":"Frontend calls yfinance directly. No new backend endpoint. Faster to implement. No backend caching — risk of rate limits on reload. Works for single-user."},{"id":"c","label":"Backend + server-side indicator calc","description":"Backend fetches OHLCV AND pre-calculates indicators before returning. Frontend just renders. Cached indicators useful for AI Advisor (Phase 5). Most backend complexity."}],"answer":null,"chat_more":"","status":"unanswered"}]},{"id":"states-error-handling","title":"States & Error Handling","questions":[{"id":"Q-10","title":"Loading, error, and no-data states?","context":"Existing patterns: LoadingSkeleton, ErrorBanner with retry, EmptyState with CTA. Historical data can: fail (yfinance timeout), be empty (new symbol), have gaps (holidays). Dark theme needs styled states.","options":[{"id":"a","label":"Full skeleton + inline errors","description":"Chart-area skeleton during load. Inline ErrorBanner inside chart container on failure. Empty: 'No chart data'. Consistent with existing error patterns."},{"id":"b","label":"Partial: chart frame + skeleton","description":"Show chart frame (axes, grid) immediately with skeleton placeholders for candles. Error shows last cached data + stale indicator if available. More polished but more complex."},{"id":"c","label":"Minimal: spinner + toast","description":"Simple spinner during load. Toast notification for errors. Empty: blank chart + message. Simplest but least informative."}],"answer":null,"chat_more":"","status":"unanswered"}]}]}</script>
+</body>
+</html>

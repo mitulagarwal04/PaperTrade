@@ -7,6 +7,7 @@ import PortfolioPage from "./pages/PortfolioPage";
 import OrdersPage from "./pages/OrdersPage";
 import AssetsPage from "./pages/AssetsPage";
 import SettingsPage from "./pages/SettingsPage";
+import ChartPage from "./pages/ChartPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import "./index.css";
 
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { path: "portfolio", element: <PortfolioPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "assets", element: <AssetsPage /> },
+      { path: "chart/:symbol", element: <ChartPage /> },
       { path: "settings", element: <SettingsPage /> },
     ],
   },

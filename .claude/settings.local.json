@@ -38,7 +38,16 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\" http://localhost:5173)",
       "Bash(timeout 3 websocat ws://localhost:5173/ws)",
       "Bash(python3 -c ' *)",
-      "Bash(echo \"WS test: $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/ws\\) \\(upgrade needed\\)\")"
+      "Bash(echo \"WS test: $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/ws\\) \\(upgrade needed\\)\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(identify /home/pichuu/Desktop/PaperTrade/backend/htmlcov/favicon_32_cb_c827f16f.png)",
+      "Bash(mediainfo /home/pichuu/Desktop/PaperTrade/backend/htmlcov/favicon_32_cb_c827f16f.png)",
+      "Bash(python3 *)",
+      "Bash(npm ls *)",
+      "Bash(npm ci *)",
+      "Bash(gsd-sdk query *)",
+      "Bash(npx tsc *)",
+      "Bash(npx vitest *)"
     ]
   }
 }

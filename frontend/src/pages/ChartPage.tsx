@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { IChartApi, ISeriesApi } from 'lightweight-charts';
+import { IChartApi, ISeriesApi, Time } from 'lightweight-charts';
 import { usePriceStore } from '@/stores/priceStore';
 import { useChartData } from '@/hooks/useChartData';
 import { useTimeframe } from '@/hooks/useTimeframe';
@@ -10,8 +10,13 @@ import { TimeframeSelector } from '@/components/chart/TimeframeSelector';
 import { PriceInfoBar } from '@/components/chart/PriceInfoBar';
 import { ChartSkeleton } from '@/components/chart/ChartSkeleton';
 import { ErrorBanner } from '@/components/shared/ErrorBanner';
+import { IndicatorDropdown } from '@/components/chart/IndicatorDropdown';
+import { IndicatorChip } from '@/components/chart/IndicatorChip';
+import { calcSMA, calcEMA, calcRSI, calcBollingerBands, calcMACD, calcVolumeProfile } from '@/lib/indicatorUtils';
+import { CHART_INDICATOR_COLORS } from '@/lib/constants';
 import { rangeToInterval } from '@/lib/candleUtils';
 import { cn } from '@/lib/utils';
+import type { CandleData } from '@/lib/types/chart';
 
 export default function ChartPage() {
   const { symbol } = useParams<{ symbol: string }>();
@@ -23,6 +28,151 @@ export default function ChartPage() {
   const { data, isPending, isError, error, refetch } = useChartData(symbol || '', range);
   const prices = usePriceStore((s) => s.prices);
   const priceData = symbol ? prices[symbol] : undefined;
+
+  // --- Indicator state ---
+  const [activeIndicators, setActiveIndicators] = useState<string[]>([]);
+  const indicatorSeriesRef = useRef<Record<string, any>>({});
+
+  const toggleIndicator = useCallback((id: string) => {
+    setActiveIndicators(prev => {
+      const isActive = prev.includes(id);
+      if (isActive) {
+        // Remove indicator from chart
+        const series = indicatorSeriesRef.current[id];
+        if (series && chartApiRef.current) {
+          if (Array.isArray(series)) {
+            series.forEach((s: any) => {
+              try { chartApiRef.current!.removeSeries(s); } catch {}
+            });
+          } else {
+            try { chartApiRef.current.removeSeries(series); } catch {}
+          }
+        }
+        delete indicatorSeriesRef.current[id];
+        return prev.filter(i => i !== id);
+      } else {
+        // Add indicator to chart
+        if (chartApiRef.current && candles.length > 0) {
+          addIndicatorToChart(id, candles, chartApiRef.current, indicatorSeriesRef.current);
+        }
+        return [...prev, id];
+      }
+    });
+  }, [candles, chartApiRef.current]);
+
+  // --- Indicator overlay helpers ---
+  function addIndicatorToChart(
+    id: string,
+    candleData: CandleData[],
+    chart: IChartApi,
+    seriesRef: Record<string, any>,
+  ) {
+    switch (id) {
+      case 'SMA': {
+        const values = calcSMA(candleData, 20);
+        const series = chart.addLineSeries({
+          color: CHART_INDICATOR_COLORS.sma,
+          lineWidth: 1,
+          lastValueVisible: true,
+          priceLineVisible: false,
+        });
+        series.setData(values.map(v => ({ time: v.time as Time, value: v.value })));
+        seriesRef['SMA'] = series;
+        break;
+      }
+      case 'EMA': {
+        const values = calcEMA(candleData, 20);
+        const series = chart.addLineSeries({
+          color: CHART_INDICATOR_COLORS.ema,
+          lineWidth: 1,
+          lastValueVisible: true,
+          priceLineVisible: false,
+        });
+        series.setData(values.map(v => ({ time: v.time as Time, value: v.value })));
+        seriesRef['EMA'] = series;
+        break;
+      }
+      case 'RSI': {
+        const values = calcRSI(candleData, 14);
+        const series = chart.addLineSeries({
+          color: CHART_INDICATOR_COLORS.rsi,
+          lineWidth: 1,
+          lastValueVisible: true,
+          priceLineVisible: false,
+          priceScaleId: 'rsi',
+          priceFormat: { type: 'custom', formatter: (v: number) => v.toFixed(0) },
+        });
+        chart.priceScale('rsi').applyOptions({
+          scaleMargins: { top: 0.7, bottom: 0.15 },
+        });
+        series.setData(values.map(v => ({ time: v.time as Time, value: v.value })));
+        seriesRef['RSI'] = series;
+        break;
+      }
+      case 'BB': {
+        const { upper, middle, lower } = calcBollingerBands(candleData, 20, 2);
+        const color = CHART_INDICATOR_COLORS.bollinger;
+        const upperSeries = chart.addLineSeries({
+          color, lineWidth: 1, lastValueVisible: false, priceLineVisible: false,
+        });
+        upperSeries.setData(upper.map(v => ({ time: v.time as Time, value: v.value })));
+        const middleSeries = chart.addLineSeries({
+          color: color + '99', lineWidth: 1, lastValueVisible: false, priceLineVisible: false,
+        });
+        middleSeries.setData(middle.map(v => ({ time: v.time as Time, value: v.value })));
+        const lowerSeries = chart.addLineSeries({
+          color, lineWidth: 1, lastValueVisible: false, priceLineVisible: false,
+        });
+        lowerSeries.setData(lower.map(v => ({ time: v.time as Time, value: v.value })));
+        seriesRef['BB'] = [upperSeries, middleSeries, lowerSeries];
+        break;
+      }
+      case 'MACD': {
+        const { macd, signal, histogram } = calcMACD(candleData);
+        const macdSeries = chart.addLineSeries({
+          color: CHART_INDICATOR_COLORS.macd, lineWidth: 1, lastValueVisible: true, priceLineVisible: false,
+          priceScaleId: 'macd',
+        });
+        macdSeries.setData(macd.map(v => ({ time: v.time as Time, value: v.value })));
+        const signalSeries = chart.addLineSeries({
+          color: CHART_INDICATOR_COLORS.macdSignal, lineWidth: 1, lastValueVisible: true, priceLineVisible: false,
+          priceScaleId: 'macd',
+        });
+        signalSeries.setData(signal.map(v => ({ time: v.time as Time, value: v.value })));
+        const histSeries = chart.addHistogramSeries({
+          color: CHART_INDICATOR_COLORS.macdHistogram, priceFormat: { type: 'volume' },
+          priceScaleId: 'macd',
+        });
+        chart.priceScale('macd').applyOptions({
+          scaleMargins: { top: 0.85, bottom: 0 },
+        });
+        histSeries.setData(histogram.map(v => ({
+          time: v.time as Time,
+          value: v.value,
+          color: v.value >= 0 ? '#22C55E' : '#EF4444',
+        })));
+        seriesRef['MACD'] = [macdSeries, signalSeries, histSeries];
+        break;
+      }
+      case 'VOL': {
+        const values = calcVolumeProfile(candleData);
+        const series = chart.addHistogramSeries({
+          priceFormat: { type: 'volume' },
+          priceScaleId: 'volume',
+        });
+        chart.priceScale('volume').applyOptions({
+          scaleMargins: { top: 0.8, bottom: 0 },
+        });
+        series.setData(values.map(v => ({
+          time: v.time as Time,
+          value: v.value,
+          color: v.value > 0 ? '#22C55E66' : '#EF444466',
+        })));
+        seriesRef['VOL'] = series;
+        break;
+      }
+    }
+  }
 
   // Store last candle for price info bar
   const candles = data?.data ?? [];
@@ -81,6 +231,17 @@ export default function ChartPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Indicator toolbar per UI-SPEC layout */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <IndicatorDropdown
+          active={activeIndicators}
+          onToggle={toggleIndicator}
+        />
+        {activeIndicators.map((id) => (
+          <IndicatorChip key={id} id={id} onRemove={toggleIndicator} />
+        ))}
       </div>
 
       {/* Chart area per UI-SPEC states */}

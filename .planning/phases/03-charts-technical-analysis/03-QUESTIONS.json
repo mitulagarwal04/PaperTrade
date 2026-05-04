@@ -1,0 +1,304 @@
+{
+  "phase": "03-charts-technical-analysis",
+  "generated_at": "2026-05-04T17:08:00Z",
+  "stats": {
+    "total": 10,
+    "answered": 10,
+    "chat_more": 0,
+    "remaining": 0
+  },
+  "sections": [
+    {
+      "id": "chart-library-types",
+      "title": "Chart Library & Types",
+      "questions": [
+        {
+          "id": "Q-01",
+          "title": "Which charting library?",
+          "context": "Need interactive financial charts. Existing frontend: React 18 + TailwindCSS (dark mode v1). TradingView Lightweight Charts is purpose-built for financial charts (candlestick, indicators built-in), ~45KB gzipped, industry standard for trading UIs. Not React-native (imperative API) — needs thin wrapper. Chart.js has candlestick via plugin, React wrapper available. Recharts has NO built-in candlestick — would need custom SVG work.",
+          "options": [
+            {
+              "id": "a",
+              "label": "TradingView Lightweight Charts",
+              "description": "Purpose-built financial charting. Candlestick, line, bar, area out of box. Built-in MA, RSI, MACD indicators. ~45KB gzipped. Industry standard for trading UIs. Not React-native — needs thin React wrapper component."
+            },
+            {
+              "id": "b",
+              "label": "Chart.js + react-chartjs-2",
+              "description": "General-purpose charting with candlestick plugin (chartjs-chart-financial). React wrapper via react-chartjs-2. Larger bundle ~60KB + plugins. Less polished financial chart UX than TradingView. Good if you want non-financial chart types too."
+            },
+            {
+              "id": "c",
+              "label": "Recharts",
+              "description": "Pure React charts. Clean API, easy integration. NO built-in candlestick — would need custom SVG implementation. Best for standard charts only. Would require significant custom work for financial features."
+            }
+          ],
+          "answer": "a",
+          "chat_more": "",
+          "status": "answered"
+        },
+        {
+          "id": "Q-02",
+          "title": "Which chart types for v1?",
+          "context": "Candlestick is the standard for financial analysis. Line charts show simpler trend views. Bar charts show OHLC data. Area charts show fills. Heikin-Ashi is a Japanese candlestick variant popular among traders. More types = more dev time.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Candlestick only",
+              "description": "Standard OHLC candlestick chart. Simplest to implement. Add other chart types in later phases. All screen real estate for candlestick controls."
+            },
+            {
+              "id": "b",
+              "label": "Candlestick + Line",
+              "description": "Candlestick for detailed analysis + line chart for quick trend views. Both supported natively by TradingView LW. Good balance of utility and development cost."
+            },
+            {
+              "id": "c",
+              "label": "Full: Candle + Line + Bar + Area",
+              "description": "Candlestick (primary), line, OHLC bar, and area charts. Full flexibility. More UI complexity for the chart type selector. Most dev time."
+            }
+          ],
+          "answer": "b",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "chart-page-ux",
+      "title": "Chart Page UX",
+      "questions": [
+        {
+          "id": "Q-03",
+          "title": "How do users open a chart?",
+          "context": "Assets currently listed as text rows in AssetsPage. Existing navigation patterns: React Router v6 pages (Dashboard, Portfolio, Orders, Assets, Settings), right side panel (order form), and dialog modals (cancel order). AssetPriceRow component shows symbol/name/price but has no click interaction yet.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Full dedicated chart page",
+              "description": "Click asset symbol → navigate to /chart/{symbol}. Full screen chart with timeframe controls, indicator toggles. Standard brokerage pattern (Zerodha Kite, TradingView). Most real estate for analysis."
+            },
+            {
+              "id": "b",
+              "label": "Slide-out side panel",
+              "description": "Click asset → chart opens in right side panel (same pattern as existing order form). Quick view without leaving current page. Less space for indicators/tools on small screens."
+            },
+            {
+              "id": "c",
+              "label": "Modal / overlay",
+              "description": "Chart opens in centered overlay on any page. Moderate space. Blocks background interaction. Middle ground but unusual for trading apps."
+            }
+          ],
+          "answer": "a",
+          "chat_more": "",
+          "status": "answered"
+        },
+        {
+          "id": "Q-04",
+          "title": "Mobile chart behavior?",
+          "context": "Existing frontend is responsive with left sidebar (desktop) → bottom tab bar (mobile). Charts on mobile need special consideration due to small screens and touch interactions. TradingView LW supports touch gestures natively.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Same page, responsive",
+              "description": "Chart page adapts to screen width. Same full-screen chart page on mobile with touch-optimized controls. Controls move below chart on small screens. Simpler codebase — one chart component."
+            },
+            {
+              "id": "b",
+              "label": "Simplified mobile view",
+              "description": "Mobile gets a stripped-down chart (candlestick only, fewer indicators, larger touch targets). Desktop gets full feature set. More dev work but better UX on each platform."
+            },
+            {
+              "id": "c",
+              "label": "Charts not shown on mobile (v1)",
+              "description": "Chart page redirects or shows 'Open on desktop' message on mobile. Simplest approach. Add mobile chart support in a later phase."
+            }
+          ],
+          "answer": "a",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "technical-indicators",
+      "title": "Technical Indicators",
+      "questions": [
+        {
+          "id": "Q-05",
+          "title": "Which indicators in v1?",
+          "context": "TradingView Lightweight Charts has built-in MA, RSI, MACD calculations that can be added as series overlays. Other indicators (Bollinger Bands, Volume, Stochastic) need custom calc or TA-Lib server-side. Tradeoff: more indicators = more dev time + UI complexity for indicator selector panels.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Minimal: MA + RSI",
+              "description": "Moving Averages (SMA/EMA) + RSI only. Quick to implement (built into TradingView LW). Covers basic trend + momentum analysis. Least UI complexity. Add MACD and others later."
+            },
+            {
+              "id": "b",
+              "label": "Standard: MA + RSI + MACD",
+              "description": "Moving Averages, RSI, and MACD. Covers trend-following, momentum, and trend strength. All built into TradingView LW. Balanced v1 scope."
+            },
+            {
+              "id": "c",
+              "label": "Full suite: MA + RSI + MACD + Bollinger + Volume",
+              "description": "Everything available in TradingView LW out of box. Bollinger Bands for volatility, volume for confirmation. More UI complexity (indicator selector, config panels like period, colors). Most dev time but most complete."
+            }
+          ],
+          "answer": "c",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "drawing-tools",
+      "title": "Drawing Tools",
+      "questions": [
+        {
+          "id": "Q-06",
+          "title": "Drawing tools scope for v1?",
+          "context": "Drawing tools (trendlines, horizontal/vertical lines, annotations) are a success criterion (SC-3: 'User can draw trendlines, annotations, and other shapes, persisting during session'). TradingView LW has a separate drawing tools plugin but state management for persistence adds complexity.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Skip drawings — v1 is read-only charts",
+              "description": "No drawing tools. Users can view charts and indicators but not annotate. Simplest to build. Requirement TA-03 and SC-3 would be deferred."
+            },
+            {
+              "id": "b",
+              "label": "Basic: trendlines + horizontal lines",
+              "description": "Trendline tool + horizontal/vertical lines. Most common drawing needs for technical analysis. Skip text annotations and complex shapes. Reasonable v1 scope. In-session persistence only (no DB)."
+            },
+            {
+              "id": "c",
+              "label": "Full drawing suite",
+              "description": "Trendlines, horizontal/vertical lines, ray lines, annotations text, and session persistence. Full parity with requirement TA-03. Significant dev effort — drawing tool UI, state management, and canvas interactions."
+            }
+          ],
+          "answer": "c",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "timeframes-data",
+      "title": "Timeframes & Data Source",
+      "questions": [
+        {
+          "id": "Q-07",
+          "title": "Which timeframe presets for v1?",
+          "context": "Backend needs to fetch historical data (yfinance ticker.history()). Available intervals: 1m, 2m, 5m, 15m, 30m, 60m, 1d, 5d, 1wk, 1mo. Not all intervals for all periods (e.g., 1m only for last 7 days). More presets = more API calls + caching complexity.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Minimal: 1D, 1W, 1M, 3M, 1Y",
+              "description": "Most common timeframes. 1D shows intraday (5m candles), 1W (15m), 1M/3M (1h), 1Y (1d). Simple button selector UI. Fastest to implement."
+            },
+            {
+              "id": "b",
+              "label": "Standard: 1D, 5D, 1M, 3M, 6M, 1Y, 5Y",
+              "description": "Adds 5D (weekly view), 6M (half-year trend), 5Y (long-term). Standard brokerage range. More data fetching, especially 5Y at daily candles. More caching required."
+            },
+            {
+              "id": "c",
+              "label": "Full: time presets + custom date range",
+              "description": "Timeframe buttons + date range picker for any start/end date. Most flexible but adds date picker UI component and more complex backend query logic."
+            }
+          ],
+          "answer": "b",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "real-time-backend",
+      "title": "Real-time Updates & Backend",
+      "questions": [
+        {
+          "id": "Q-08",
+          "title": "How should charts update in real-time?",
+          "context": "Existing WebSocket streams prices every 5s via /ws/prices. Data format: {type: 'prices', data: {SYMBOL: {price, currency, source}}}. TradingView LW supports real-time updates via chart.update() method — appends new ticks to current candle. Can reuse existing WS stream or create chart-specific stream.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Manual refresh only",
+              "description": "Chart loads static historical data. User clicks 'Refresh' button or changes timeframe to get latest. Simplest to implement. No real-time update logic beyond existing page refresh patterns."
+            },
+            {
+              "id": "b",
+              "label": "Auto-refresh on interval",
+              "description": "Chart polls latest candle data every N seconds (e.g., 10s, matching existing REFETCH_INTERVAL). No WebSocket integration needed for charts. Consistent with existing useQuery refetch pattern."
+            },
+            {
+              "id": "c",
+              "label": "Live WebSocket updates",
+              "description": "Chart subscribes to WS stream and updates current candle in real-time as ticks arrive. Auto-scrolls when viewing latest. Most engaging UX. TradingView LW supports this natively via update(). Most complex — needs candle aggregation logic."
+            }
+          ],
+          "answer": "c",
+          "chat_more": "",
+          "status": "answered"
+        },
+        {
+          "id": "Q-09",
+          "title": "Where should candle data be calculated?",
+          "context": "yfinance can return OHLCV data via ticker.history(). Existing pattern: all market data flows through backend (backend proxies external APIs, caches responses). No existing chart endpoint. Two main approaches with tradeoffs for caching + indicator computation.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Backend proxy: new /api/v1/charts endpoint",
+              "description": "Backend fetches historical OHLCV from yfinance, caches candle data, returns standard format. Consistent with existing architecture (prices flow through backend). Backend handles symbol normalization. Cache reduces yfinance rate limit hits."
+            },
+            {
+              "id": "b",
+              "label": "Frontend-direct: yfinance call from client",
+              "description": "Frontend calls yfinance directly for historical candle data. No new backend endpoint. Faster to implement. No backend caching — could hit yfinance rate limits on page reloads. Works for single-user app."
+            },
+            {
+              "id": "c",
+              "label": "Backend proxy + server-side indicator calc",
+              "description": "Backend endpoint fetches OHLCV AND pre-calculates technical indicators (MA, RSI, MACD) before returning. Frontend just renders. More backend complexity but cached indicators are useful for future AI Advisor phase (Phase 5)."
+            }
+          ],
+          "answer": "a",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    },
+    {
+      "id": "states-error-handling",
+      "title": "States & Error Handling",
+      "questions": [
+        {
+          "id": "Q-10",
+          "title": "Loading, error, and no-data states?",
+          "context": "Existing pattern: loading skeleton (TableSkeleton), error banner with retry (ErrorBanner), empty state with CTA. Historical data can fail (yfinance timeout), be empty (new symbol with no data), or have gaps (trading holidays). Dark theme chart area needs appropriate styling for each state.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Full skeleton + inline errors",
+              "description": "Full chart-area skeleton during loading. Inline error banner inside chart container on failure (reuses existing ErrorBanner pattern). Empty state: 'No chart data available.' Consistent with existing app patterns."
+            },
+            {
+              "id": "b",
+              "label": "Partial: show chart frame + skeleton",
+              "description": "Show chart frame (axes, grid) immediately with skeleton placeholders for candles. Error state shows last good data if cached + stale indicator. More polished but requires rendering chart before data arrives."
+            },
+            {
+              "id": "c",
+              "label": "Minimal: spinner + toast on error",
+              "description": "Simple spinner during load. Toast notification for errors. No inline error banner. Empty state: blank chart area with message. Simplest to implement but least informative."
+            }
+          ],
+          "answer": "a",
+          "chat_more": "",
+          "status": "answered"
+        }
+      ]
+    }
+  ]
+}
